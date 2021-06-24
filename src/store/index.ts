@@ -1,3 +1,4 @@
+import { FirebaseApp } from "@firebase/app";
 import { createStore, useStore as vuexUseStore } from "vuex";
 export interface Toast {
   text: string;
@@ -5,16 +6,17 @@ export interface Toast {
 }
 export interface State {
   toastQueue: Toast[];
-  isAuth: Boolean;
+  firebase: FirebaseApp;
 }
 
 const store = createStore<State>({
   state: {
     toastQueue: [],
-    isAuth: false,
+    // @ts-ignore
+    firebase: null,
   },
   mutations: {
-    REMOVE_TOAST(state) {
+    REMOVE_TOAST(state: any) {
       state.toastQueue.shift();
     },
     ADD_TOAST(state, toast: Toast) {
