@@ -1,8 +1,7 @@
 <template>
   <main class="flex flex-col justify-center items-center">
-    <s-gradient-heading :size="6" noscale>Login</s-gradient-heading>
-
-    <form class="max-w-xl mt-10 w-full px-4 flex flex-col" @submit.prevent>
+    <s-gradient-heading :size="6" noscale>Register</s-gradient-heading>
+    <form class="max-w-xl w-full px-4 mt-10 flex flex-col" @submit.prevent>
       <s-input-text
         name="username"
         placeholder="johnsmith16"
@@ -16,12 +15,19 @@
         placeholder="securepassword123"
         v-model="password"
       />
-      <s-button class="w-full mt-6">Sign In</s-button>
+      <s-input-text
+        name="confirmPassword"
+        label="Confirm Password"
+        censor
+        v-model="confirmPassword"
+      />
+
+      <s-button class="w-full mt-10">Create Account</s-button>
       <s-button-text
         class="self-end mt-2"
-        @click="$router.push({ name: 'Register' })"
+        @click="$router.push({ name: 'Login' })"
       >
-        Need an account?
+        Already have an account?
       </s-button-text>
     </form>
   </main>
@@ -48,13 +54,16 @@ export default defineComponent({
   setup() {
     const username = ref("");
     const password = ref("");
+    const confirmPassword = ref("");
 
     return {
       username,
       password,
+      confirmPassword,
     };
   },
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+</style>

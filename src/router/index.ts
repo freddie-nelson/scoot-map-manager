@@ -4,13 +4,9 @@ import Maps from "@/views/Maps.vue";
 import Installed from "@/views/Installed.vue";
 import Profile from "@/views/Profile.vue";
 import Login from "@/views/Login.vue";
+import Register from "@/views/Register.vue";
 
 const routes: Array<RouteRecordRaw> = [
-  {
-    path: "/login",
-    name: "Login",
-    component: Login,
-  },
   {
     path: "/",
     name: "Home",
@@ -31,6 +27,16 @@ const routes: Array<RouteRecordRaw> = [
     name: "Profile",
     component: Profile,
   },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login,
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: Register,
+  },
   // {
   //   path: "/about",
   //   name: "About",
@@ -44,6 +50,10 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
+});
+
+router.beforeEach((g) => {
+  if (g.name?.toString().match(/(Profile|Upload)/)) router.push({ name: "Login" });
 });
 
 export default router;
