@@ -1,5 +1,8 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import Home from "@/views/Home.vue";
+import Maps from "@/views/Maps.vue";
+import Installed from "@/views/Installed.vue";
+import Profile from "@/views/Profile.vue";
 import Login from "@/views/Login.vue";
 
 const routes: Array<RouteRecordRaw> = [
@@ -12,6 +15,21 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "Home",
     component: Home,
+  },
+  {
+    path: "/maps",
+    name: "Maps",
+    component: Maps,
+  },
+  {
+    path: "/installed",
+    name: "Installed",
+    component: Installed,
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: Profile,
   },
   // {
   //   path: "/about",
