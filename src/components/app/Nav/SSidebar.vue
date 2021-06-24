@@ -1,7 +1,6 @@
 <template>
   <nav
     class="
-      w-60
       pr-24
       bg-red-500
       h-full
@@ -9,60 +8,31 @@
       flex flex-col
       justify-between
       items-center
-      py-64
     "
   >
     <router-link
-      class="
-        block
-        w-12
-        h-12
-        hover:text-yellow-400
-        transition-colors
-        duration-300
-      "
+      class="block hover:text-yellow-400 transition-colors duration-300"
       :class="{ 'text-yellow-400': $route.name === 'Home' }"
       to="/"
     >
       <Icon class="w-full h-full" :icon="icons.home" />
     </router-link>
     <router-link
-      class="
-        block
-        w-12
-        h-12
-        hover:text-yellow-400
-        transition-colors
-        duration-300
-      "
+      class="block hover:text-yellow-400 transition-colors duration-300"
       :class="{ 'text-yellow-400': $route.name === 'Maps' }"
       to="/maps"
     >
       <Icon class="w-full h-full" :icon="icons.map" />
     </router-link>
     <router-link
-      class="
-        block
-        w-12
-        h-12
-        hover:text-yellow-400
-        transition-colors
-        duration-300
-      "
+      class="block hover:text-yellow-400 transition-colors duration-300"
       :class="{ 'text-yellow-400': $route.name === 'Installed' }"
       to="/installed"
     >
       <Icon class="w-full h-full" :icon="icons.folder" />
     </router-link>
     <router-link
-      class="
-        block
-        w-12
-        h-12
-        hover:text-yellow-400
-        transition-colors
-        duration-300
-      "
+      class="block hover:text-yellow-400 transition-colors duration-300"
       :class="{ 'text-yellow-400': $route.name === 'Profile' }"
       to="/profile"
     >
@@ -98,4 +68,16 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+nav {
+  padding-top: 28vh;
+  padding-bottom: 28vh;
+  min-width: 10.5rem;
+  width: 12vw;
+  max-width: 12rem;
+
+  a {
+    width: 40%;
+  }
+}
+</style>
