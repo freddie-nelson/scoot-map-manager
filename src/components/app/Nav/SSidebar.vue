@@ -2,7 +2,7 @@
   <nav
     class="
       pr-24
-      bg-red-500
+      bg-primary-600
       h-full
       text-white
       flex flex-col
@@ -11,29 +11,29 @@
     "
   >
     <router-link
-      class="block hover:text-yellow-400 transition-colors duration-300"
-      :class="{ 'text-yellow-400': $route.name === 'Home' }"
+      class="block hover:text-accent-100 transition-colors duration-300"
+      :class="{ 'text-accent-100': $route.name === 'Home' }"
       to="/"
     >
       <Icon class="w-full h-full" :icon="icons.home" />
     </router-link>
     <router-link
-      class="block hover:text-yellow-400 transition-colors duration-300"
-      :class="{ 'text-yellow-400': $route.name === 'Maps' }"
+      class="block hover:text-accent-100 transition-colors duration-300"
+      :class="{ 'text-accent-100': $route.name === 'Maps' }"
       to="/maps"
     >
       <Icon class="w-full h-full" :icon="icons.map" />
     </router-link>
     <router-link
-      class="block hover:text-yellow-400 transition-colors duration-300"
-      :class="{ 'text-yellow-400': $route.name === 'Installed' }"
+      class="block hover:text-accent-100 transition-colors duration-300"
+      :class="{ 'text-accent-100': $route.name === 'Installed' }"
       to="/installed"
     >
       <Icon class="w-full h-full" :icon="icons.folder" />
     </router-link>
     <router-link
-      class="block hover:text-yellow-400 transition-colors duration-300"
-      :class="{ 'text-yellow-400': $route.name === 'Profile' }"
+      class="block hover:text-accent-100 transition-colors duration-300"
+      :class="{ 'text-accent-100': $route.name === 'Profile' }"
       to="/profile"
     >
       <Icon class="w-full h-full" :icon="icons.user" />

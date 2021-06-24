@@ -1,6 +1,6 @@
 <template>
   <s-sidebar />
-  <router-view class="w-full h-full -ml-24" />
+  <router-view class="w-full h-full -ml-24 bg-bg-dark" />
 </template>
 
 <script>
@@ -32,6 +32,5 @@ body {
 
 main {
   border-radius: 1rem;
-  background-color: #080a0d;
 }
 </style>
