@@ -5,14 +5,24 @@ export interface Toast {
   text: string;
   duration?: number;
 }
+
+export interface Map {
+  image: string;
+  name: string;
+  filename: string;
+  creator: string;
+}
+
 export interface State {
   toastQueue: Toast[];
   user?: User;
+  installedMaps: Map[];
 }
 
 const store = createStore<State>({
   state: {
     toastQueue: [],
+    installedMaps: [],
   },
   mutations: {
     REMOVE_TOAST(state: any) {
