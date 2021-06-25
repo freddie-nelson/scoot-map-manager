@@ -48,7 +48,9 @@ export default defineComponent({
       homeDir = await path.homeDir();
     });
 
-    const gameDir = ref(store.state.gameDir.dir);
+    const gameDir = ref(
+      `${store.state.gameDir.dir}/${store.state.gameDir.base}`
+    );
 
     const openDialog = async () => {
       let dir = await dialog.open({

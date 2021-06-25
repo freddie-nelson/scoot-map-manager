@@ -1,10 +1,13 @@
 <template>
-  <s-map-card
-    v-for="map in maps"
-    :key="map.name"
-    :map="map"
-    :buttonIcon="buttonIcon"
-  />
+  <section class="max-h-full">
+    <s-map-card
+      v-for="(map, i) in maps"
+      :key="map.name"
+      :map="map"
+      :buttonIcon="buttonIcon"
+      @clicked="$emit('map-clicked', i)"
+    />
+  </section>
 </template>
 
 <script lang="ts">
@@ -23,19 +26,20 @@ export default defineComponent({
   props: {
     maps: {
       type: Array as () => Map[],
-      default() {
-        return [];
-      },
+      required: true,
     },
     buttonIcon: {
       type: Object,
-      default() {
-        return downloadIcon;
-      },
+      default: downloadIcon,
     },
   },
 });
 </script>
 
 <style lang="scss" scoped>
+section {
+  display: grid;
+  grid-gap: 1.4rem;
+  grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+}
 </style>

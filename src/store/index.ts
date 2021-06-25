@@ -9,7 +9,7 @@ export interface Toast {
 export interface Map {
   image: string;
   name: string;
-  filename: string;
+  parkFile: string;
   creator: string;
 }
 
@@ -18,9 +18,10 @@ export type ParsedPath = ReturnType<typeof pathParse>;
 export interface State {
   toastQueue: Toast[];
   user?: User;
-  installedMaps: Map[];
   gameDir: ParsedPath;
   mapsDir: ParsedPath;
+  installedMaps: Map[];
+  lastLoadedMaps: number;
 }
 
 const gameDirStr = window.localStorage.getItem("gameDir");
@@ -29,9 +30,10 @@ const gameDir: ParsedPath = gameDirStr ? JSON.parse(gameDirStr) : pathParse("/")
 const store = createStore<State>({
   state: {
     toastQueue: [],
-    installedMaps: [],
     gameDir: gameDir,
     mapsDir: gameDir,
+    installedMaps: [],
+    lastLoadedMaps: 0,
   },
   mutations: {
     REMOVE_TOAST(state: any) {
@@ -46,13 +48,24 @@ const store = createStore<State>({
     },
 
     SET_GAME_DIR(state, dir: ParsedPath) {
-      dir.dir += "/SCOOT";
       state.gameDir = dir;
       window.localStorage.setItem("gameDir", JSON.stringify(dir));
 
-      const mapsDir: ParsedPath = { ...state.gameDir };
-      mapsDir.dir += "/Scoot_Data/StreamingAssets/Map Saves";
-      state.mapsDir = mapsDir;
+      state.mapsDir = pathParse(`${dir.dir}/${dir.base}/Scoot_Data/StreamingAssets/Map Saves/`);
+    },
+
+    SET_INSTALLED_MAPS(state, maps: Map[]) {
+      state.installedMaps = maps;
+    },
+    ADD_INSTALLED_MAP(state, map: Map) {
+      state.installedMaps.push(map);
+    },
+    REMOVE_INSTALLED_MAP(state, index: number) {
+      state.installedMaps.splice(index, 1);
+    },
+
+    SET_LAST_LOADED(state, time: number) {
+      state.lastLoadedMaps = time;
     },
   },
   actions: {},

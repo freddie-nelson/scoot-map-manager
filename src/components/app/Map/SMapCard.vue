@@ -2,7 +2,6 @@
   <div
     class="
       h-64
-      max-w-sm
       w-full
       bg-input-blur
       rounded-lg
@@ -82,15 +81,11 @@ export default defineComponent({
   props: {
     map: {
       type: Object as () => Map,
-      default() {
-        return {};
-      },
+      required: true,
     },
     buttonIcon: {
       type: Object,
-      default() {
-        return downloadIcon;
-      },
+      default: downloadIcon,
     },
   },
 });
