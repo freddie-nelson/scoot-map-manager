@@ -5,6 +5,7 @@ import Installed from "@/views/Installed.vue";
 import Profile from "@/views/Profile.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
+import store from "@/store";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -53,7 +54,7 @@ const router = createRouter({
 });
 
 router.beforeEach((g) => {
-  if (g.name?.toString().match(/(Profile|Upload)/)) router.push({ name: "Login" });
+  if (g.name?.toString().match(/(Profile|Upload)/) && !store.state.user) router.push({ name: "Login" });
 });
 
 export default router;

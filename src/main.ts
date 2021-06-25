@@ -6,6 +6,7 @@ import "./assets/tailwind.css";
 
 // setup firebase
 import { initializeApp } from "firebase/app";
+import { browserLocalPersistence, getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA5Byw4nqMC4U0Q9TY3c1W09wsJzXhIKP8",
@@ -17,8 +18,19 @@ const firebaseConfig = {
   measurementId: "G-8SEWBC1GRC",
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
-store.state.firebase = firebaseApp;
+initializeApp(firebaseConfig);
+
+const auth = getAuth();
+auth.setPersistence(browserLocalPersistence);
+
+auth.onAuthStateChanged(() => {
+  if (!auth.currentUser) return;
+
+  store.commit("SET_USER", auth.currentUser);
+
+  if (router.currentRoute.value.name?.toString().match(/(Login)|(Register)/))
+    router.push({ name: "Profile" });
+});
 
 const app = createApp(App);
 

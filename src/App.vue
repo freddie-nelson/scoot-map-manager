@@ -1,6 +1,6 @@
 <template>
   <s-sidebar />
-  <router-view class="w-full h-full -ml-24 bg-bg-dark" />
+  <router-view class="w-full h-full -ml-24 bg-bg-dark text-t-main" />
 </template>
 
 <script>
