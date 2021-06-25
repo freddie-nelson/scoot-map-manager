@@ -4,8 +4,9 @@
       :name="name"
       :label="label"
       :placeholder="placeholder"
-      v-model="value"
       :censor="censor"
+      :modelValue="modelValue"
+      @update:modelValue="$emit('update:modelValue', $event)"
     />
     <s-button-text
       class="self-end mt-1"
@@ -18,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from "vue";
+import { defineComponent, ref } from "vue";
 import SButtonText from "../Button/SButtonText.vue";
 
 import SInputText from "./SInputText.vue";
@@ -47,18 +48,10 @@ export default defineComponent({
       default: "",
     },
   },
-  setup(props, { emit }) {
-    const value = ref(props.modelValue);
-    watch(value, () => emit("update:modelValue", value));
-    watch(
-      computed(() => props.modelValue),
-      () => (value.value = props.modelValue)
-    );
-
+  setup() {
     const censor = ref(true);
 
     return {
-      value,
       censor,
     };
   },

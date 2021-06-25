@@ -13,7 +13,7 @@
         p-3
         border-solid border-2
         rounded-lg
-        text-t-sub
+        text-t-main
         border-b-light
         focus:outline-none
         focus:border-b-highlight
