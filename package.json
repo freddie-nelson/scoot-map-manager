@@ -15,6 +15,7 @@
     "autoprefixer": "^9",
     "core-js": "^3.6.5",
     "firebase": "9.0.0-beta.2",
+    "path-parse": "^1.0.7",
     "postcss": "^7",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
     "vue": "^3.0.0",
@@ -23,6 +24,8 @@
   },
   "devDependencies": {
     "@iconify/vue": "^2.0.0-rc.3",
+    "@tauri-apps/api": "^1.0.0-beta.3",
+    "@types/path-parse": "^1.0.19",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/cli-plugin-babel": "~4.5.0",

@@ -5,6 +5,8 @@ import Installed from "@/views/Installed.vue";
 import Profile from "@/views/Profile.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
+import Setup from "@/views/Setup.vue";
+
 import store from "@/store";
 
 const routes: Array<RouteRecordRaw> = [
@@ -38,6 +40,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "Register",
     component: Register,
   },
+  {
+    path: "/setup",
+    name: "Setup",
+    component: Setup,
+  },
   // {
   //   path: "/about",
   //   name: "About",
@@ -54,7 +61,14 @@ const router = createRouter({
 });
 
 router.beforeEach((g) => {
-  if (g.name?.toString().match(/(Profile|Upload)/) && !store.state.user) router.push({ name: "Login" });
+  const name = g.name?.toString();
+  if (!name) return;
+
+  if (name.match(/(Profile|Upload)/) && !store.state.user) router.push({ name: "Login" });
+
+  if (!store.state.gameDir.dir && name !== "Setup") {
+    router.push({ name: "Setup" });
+  }
 });
 
 export default router;
