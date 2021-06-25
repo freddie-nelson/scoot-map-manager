@@ -2,7 +2,7 @@
   <section class="max-h-full">
     <s-map-card
       v-for="(map, i) in maps"
-      :key="map.name"
+      :key="i"
       :map="map"
       :buttonIcon="buttonIcon"
       @clicked="$emit('map-clicked', i)"
