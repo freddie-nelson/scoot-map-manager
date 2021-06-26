@@ -47,21 +47,39 @@
         <p class="text-xs opacity-60">{{ map.creator || "Creator" }}</p>
       </div>
 
-      <button
-        class="
-          w-6
-          h-6
-          mr-2
-          focus:outline-none
-          hover:text-primary-600
-          focus:text-primary-600
-          transition-colors
-          duration-300
-        "
-        @click="$emit('clicked')"
-      >
-        <Icon class="w-full h-full" :icon="buttonIcon" />
-      </button>
+      <div class="mr-3.5 flex">
+        <button
+          v-if="buttonIcon2"
+          class="
+            w-6
+            h-6
+            mr-5
+            focus:outline-none
+            hover:text-primary-600
+            focus:text-primary-600
+            transition-colors
+            duration-300
+          "
+          @click="$emit('clicked-2')"
+        >
+          <Icon class="w-full h-full" :icon="buttonIcon2" />
+        </button>
+
+        <button
+          class="
+            w-6
+            h-6
+            focus:outline-none
+            hover:text-primary-600
+            focus:text-primary-600
+            transition-colors
+            duration-300
+          "
+          @click="$emit('clicked')"
+        >
+          <Icon class="w-full h-full" :icon="buttonIcon" />
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -86,6 +104,10 @@ export default defineComponent({
     buttonIcon: {
       type: Object,
       default: downloadIcon,
+    },
+    buttonIcon2: {
+      type: Object,
+      default: null,
     },
   },
 });

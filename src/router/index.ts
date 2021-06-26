@@ -6,6 +6,7 @@ import Profile from "@/views/Profile.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
 import Setup from "@/views/Setup.vue";
+import Upload from "@/views/Upload.vue";
 
 import store from "@/store";
 
@@ -44,6 +45,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/setup",
     name: "Setup",
     component: Setup,
+  },
+  {
+    path: "/upload",
+    name: "Upload",
+    component: Upload,
   },
   // {
   //   path: "/about",

@@ -15,9 +15,12 @@
       </div>
     </header>
 
-    <s-gradient-heading v-if="isLoading" class="text-center mt-28" :size="6">
-      Loading Maps...
-    </s-gradient-heading>
+    <div v-if="isLoading">
+      <s-gradient-heading class="text-center mt-32" :size="5">
+        Loading Maps...
+      </s-gradient-heading>
+      <s-spinner-bar class="h-5 mt-10 w-full max-w-2xl px-8 mx-auto" />
+    </div>
 
     <div v-else>
       <s-map-list
@@ -68,6 +71,7 @@ import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
 import SInputText from "@/components/shared/Input/SInputText.vue";
 import SMapList from "@/components/app/Map/SMapList.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
+import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 
 export default defineComponent({
   name: "Maps",
@@ -76,6 +80,7 @@ export default defineComponent({
     SInputText,
     SMapList,
     SButton,
+    SSpinnerBar,
   },
   setup() {
     const db = getFirestore();

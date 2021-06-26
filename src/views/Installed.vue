@@ -15,14 +15,20 @@
       </div>
     </header>
 
-    <s-gradient-heading class="text-center mt-28" :size="6" v-if="isLoading">
-      Loading Maps...
-    </s-gradient-heading>
+    <div v-if="isLoading">
+      <s-gradient-heading class="text-center mt-32" :size="5">
+        Loading Maps...
+      </s-gradient-heading>
+      <s-spinner-bar class="h-5 mt-10 w-full max-w-2xl px-8 mx-auto" />
+    </div>
+
     <s-map-list
       v-else
       :maps="$store.state.installedMaps"
       :buttonIcon="icons.trash"
+      :buttonIcon2="icons.upload"
       @map-clicked="deleteMap"
+      @map-clicked-2="tryUploadMap"
     />
   </main>
 </template>
@@ -41,8 +47,11 @@ import pathParse from "path-parse";
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
 import SMapList from "@/components/app/Map/SMapList.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
+import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 
 import trashIcon from "@iconify-icons/feather/trash";
+import uploadIcon from "@iconify-icons/feather/upload";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "Installed",
@@ -50,9 +59,11 @@ export default defineComponent({
     SGradientHeading,
     SMapList,
     SButton,
+    SSpinnerBar,
   },
   setup() {
     const store = useStore();
+    const router = useRouter();
     const mapsDir = `${store.state.mapsDir.dir}/`;
 
     const isLoading = ref(false);
@@ -128,12 +139,18 @@ export default defineComponent({
       }
     };
 
+    const tryUploadMap = (i: number) => {
+      router.push({ name: "Upload", params: { mapIndex: i } });
+    };
+
     return {
       loadMaps,
       isLoading,
       deleteMap,
+      tryUploadMap,
       icons: {
         trash: trashIcon,
+        upload: uploadIcon,
       },
     };
   },
