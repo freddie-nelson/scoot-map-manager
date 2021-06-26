@@ -1,6 +1,6 @@
 <template>
   <main class="overflow-y-scroll">
-    <header class="mb-8 flex justify-between items-center">
+    <header class="mb-11 flex justify-between items-center">
       <s-gradient-heading :size="4">Installed Maps</s-gradient-heading>
 
       <div>

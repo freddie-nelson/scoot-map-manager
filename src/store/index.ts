@@ -11,6 +11,7 @@ export interface Map {
   name: string;
   parkFile: string;
   creator: string;
+  downloads?: number;
 }
 
 export type ParsedPath = ReturnType<typeof pathParse>;
