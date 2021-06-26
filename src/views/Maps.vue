@@ -15,10 +15,34 @@
       </div>
     </header>
 
-    <s-gradient-heading class="text-center mt-28" :size="6" v-if="isLoading">
+    <s-gradient-heading v-if="isLoading" class="text-center mt-28" :size="6">
       Loading Maps...
     </s-gradient-heading>
-    <s-map-list v-else :maps="maps" @map-clicked="installMap(maps[i])" />
+
+    <div v-else>
+      <s-map-list
+        v-if="maps.length > 0"
+        :maps="maps"
+        @map-clicked="installMap(maps[$event])"
+      />
+      <h1 v-else class="font-semibold text-2xl text-center py-10 opacity-60">
+        You've reached the end, how about adding your own map?
+      </h1>
+
+      <div class="mt-10 flex justify-center">
+        <s-button @click="previousPage" class="py-1.5 w-10 h-full text-4xl">
+          &#8249;
+        </s-button>
+
+        <s-button class="py-3 w-10 h-full mx-3 text-xl">
+          {{ pageNum }}
+        </s-button>
+
+        <s-button @click="nextPage" class="py-1.5 w-10 h-full text-4xl">
+          &#8250;
+        </s-button>
+      </div>
+    </div>
   </main>
 </template>
 
@@ -36,6 +60,8 @@ import {
   QuerySnapshot,
   DocumentData,
   Query,
+  endBefore,
+  endAt,
 } from "firebase/firestore";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
@@ -54,13 +80,41 @@ export default defineComponent({
   setup() {
     const db = getFirestore();
     const mapsRef = collection(db, "maps");
+    const pageNum = ref(0);
     const perPage = ref(25);
-    let lastVisible: DocumentData;
 
     const maps = ref<Map[]>([]);
     const isLoading = ref(false);
 
-    const fetchMaps = async () => {
+    const addDocsToMaps = (docs: DocumentData[]) => {
+      maps.value = [];
+
+      docs.forEach((doc) => {
+        const data = doc.data();
+
+        const map: Map = {
+          name: data.name,
+          creator: data.creator,
+          image: data.image,
+          parkFile: data.parkFile,
+          downloads: data.downloads || 0,
+        };
+
+        maps.value.push(map);
+      });
+    };
+
+    let firstVisible: DocumentData;
+    let lastVisible: DocumentData;
+
+    const setDocBoundaries = (docs: DocumentData[]) => {
+      if (docs.length === 0) return;
+
+      firstVisible = docs[0];
+      lastVisible = docs[docs.length - 1];
+    };
+
+    const fetchNextMaps = async () => {
       let q: Query<DocumentData>;
       if (!lastVisible) {
         q = query(mapsRef, orderBy("created_at", "desc"), limit(perPage.value));
@@ -81,28 +135,63 @@ export default defineComponent({
         return;
       }
 
-      lastVisible = docs.docs[docs.docs.length - 1];
-
-      docs.docs.forEach((doc) => {
-        const data = doc.data();
-
-        const map: Map = {
-          name: data.name,
-          creator: data.creator,
-          image: data.image,
-          parkFile: data.parkFile,
-          downloads: data.downloads || 0,
-        };
-
-        maps.value.push(map);
-      });
+      setDocBoundaries(docs.docs);
+      addDocsToMaps(docs.docs);
     };
 
-    onBeforeMount(async () => {
+    const fetchPreviousMaps = async () => {
+      let q: Query<DocumentData>;
+      if (maps.value.length === 0) {
+        q = query(
+          mapsRef,
+          orderBy("created_at", "desc"),
+          endAt(lastVisible),
+          limit(perPage.value)
+        );
+      } else {
+        q = query(
+          mapsRef,
+          orderBy("created_at", "desc"),
+          endBefore(firstVisible),
+          limit(perPage.value)
+        );
+      }
+
+      let docs: QuerySnapshot<DocumentData>;
+      try {
+        docs = await getDocs(q);
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+
+      setDocBoundaries(docs.docs);
+      addDocsToMaps(docs.docs);
+    };
+
+    const nextPage = async () => {
+      if (maps.value.length === 0 && pageNum.value !== 0) return;
+
+      pageNum.value++;
       isLoading.value = true;
-      await fetchMaps();
+
+      await fetchNextMaps();
+
       isLoading.value = false;
-    });
+    };
+
+    const previousPage = async () => {
+      if (pageNum.value === 1) return;
+
+      pageNum.value--;
+      isLoading.value = true;
+
+      await fetchPreviousMaps();
+
+      isLoading.value = false;
+    };
+
+    onBeforeMount(nextPage);
 
     const installMap = (map: Map) => {
       console.log(map);
@@ -114,8 +203,11 @@ export default defineComponent({
     };
 
     return {
+      pageNum,
       maps,
       isLoading,
+      nextPage,
+      previousPage,
       installMap,
       searchTerm,
       search,
