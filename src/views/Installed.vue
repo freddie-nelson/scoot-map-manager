@@ -28,7 +28,7 @@
       :buttonIcon="icons.trash"
       :buttonIcon2="icons.upload"
       @map-clicked="deleteMap"
-      @map-clicked-2="tryUploadMap"
+      @map-clicked-2="uploadMap"
     />
   </main>
 </template>
@@ -36,13 +36,7 @@
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from "vue";
 import { useStore } from "@/store";
-import {
-  FileEntry,
-  readDir,
-  removeDir,
-  readBinaryFile,
-} from "@tauri-apps/api/fs";
-import pathParse from "path-parse";
+import useInstalledMaps from "@/hooks/useInstalledMaps";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
 import SMapList from "@/components/app/Map/SMapList.vue";
@@ -51,7 +45,6 @@ import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 
 import trashIcon from "@iconify-icons/feather/trash";
 import uploadIcon from "@iconify-icons/feather/upload";
-import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "Installed",
@@ -63,55 +56,10 @@ export default defineComponent({
   },
   setup() {
     const store = useStore();
-    const router = useRouter();
-    const mapsDir = `${store.state.mapsDir.dir}/`;
+
+    const { readAndParseMaps, deleteMap, uploadMap } = useInstalledMaps();
 
     const isLoading = ref(false);
-
-    const readAndParseMaps = async () => {
-      let folders: FileEntry[];
-      try {
-        folders = await readDir(mapsDir);
-      } catch (error) {
-        return;
-      }
-
-      store.commit("SET_INSTALLED_MAPS", []);
-
-      let i = 0;
-      for (const folder of folders) {
-        i++;
-        if (!folder.children) return;
-
-        // find map files
-        const files = await readDir(folder.path);
-
-        const parkFile = files.find((f) => f.name === "ObjectInfo.ScootPark");
-        if (!parkFile) return;
-
-        const previewImage = files.find((f) => f.name === "ParkCapture.png");
-        if (!previewImage) return;
-
-        // read image as binary
-        let byteArr: Uint8Array;
-
-        try {
-          byteArr = new Uint8Array(await readBinaryFile(previewImage.path));
-        } catch (error) {
-          return;
-        }
-
-        const blob = new Blob([byteArr], { type: "image/png" });
-
-        // add map to maps
-        store.commit("ADD_INSTALLED_MAP", {
-          name: folder.name || `Map ${i}`,
-          creator: "You",
-          image: URL.createObjectURL(blob),
-          parkFile: parkFile.path,
-        });
-      }
-    };
 
     const loadMaps = async (force?: boolean) => {
       if (!force && Date.now() - store.state.lastLoadedMaps < 300000) return;
@@ -126,28 +74,11 @@ export default defineComponent({
 
     onBeforeMount(loadMaps);
 
-    const deleteMap = async (i: number) => {
-      const map = store.state.installedMaps[i];
-      const path = pathParse(map.parkFile);
-
-      store.commit("REMOVE_INSTALLED_MAP", i);
-
-      try {
-        await removeDir(path.dir, { recursive: true });
-      } catch (error) {
-        return;
-      }
-    };
-
-    const tryUploadMap = (i: number) => {
-      router.push({ name: "Upload", params: { mapIndex: i } });
-    };
-
     return {
       loadMaps,
       isLoading,
       deleteMap,
-      tryUploadMap,
+      uploadMap,
       icons: {
         trash: trashIcon,
         upload: uploadIcon,
