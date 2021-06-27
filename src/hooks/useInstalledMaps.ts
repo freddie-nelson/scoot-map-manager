@@ -17,6 +17,7 @@ export default function () {
       return;
     }
 
+    // only proceed if a map has been modified since last load
     if (!force && folders.length === store.state.installedMaps.length) {
       let mostRecent = 0;
 
