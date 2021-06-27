@@ -1,6 +1,7 @@
 import { useStore } from "@/store";
 import { useRouter } from "vue-router";
 import { FileEntry, readDir, removeDir, readBinaryFile } from "@tauri-apps/api/fs";
+import { getLastModified } from "@/plugins/Metadata";
 import pathParse from "path-parse";
 
 export default function () {
@@ -8,12 +9,34 @@ export default function () {
   const router = useRouter();
   const mapsDir = `${store.state.mapsDir.dir}/`;
 
-  const readAndParseMaps = async () => {
+  const readAndParseMaps = async (force = false) => {
     let folders: FileEntry[];
     try {
       folders = await readDir(mapsDir);
     } catch (error) {
       return;
+    }
+
+    if (!force && folders.length === store.state.installedMaps.length) {
+      let mostRecent = 0;
+
+      for (const folder of folders) {
+        try {
+          const time = await getLastModified(folder.path);
+          if (!time) return;
+
+          if (time > mostRecent) {
+            mostRecent = time;
+          }
+        } catch (error) {
+          console.log(error);
+          return;
+        }
+      }
+
+      if (mostRecent < store.state.lastLoadedMaps) {
+        return;
+      }
     }
 
     store.commit("SET_INSTALLED_MAPS", []);
@@ -50,6 +73,8 @@ export default function () {
         image: URL.createObjectURL(blob),
         parkFile: parkFile.path,
       });
+
+      store.commit("SET_LAST_LOADED", Date.now());
     }
   };
 

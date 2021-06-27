@@ -35,7 +35,6 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from "vue";
-import { useStore } from "@/store";
 import useInstalledMaps from "@/hooks/useInstalledMaps";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
@@ -55,19 +54,16 @@ export default defineComponent({
     SSpinnerBar,
   },
   setup() {
-    const store = useStore();
-
     const { readAndParseMaps, deleteMap, uploadMap } = useInstalledMaps();
 
     const isLoading = ref(false);
 
-    const loadMaps = async (force?: boolean) => {
-      if (!force && Date.now() - store.state.lastLoadedMaps < 300000) return;
+    const loadMaps = async (force = false) => {
+      if (isLoading.value) return;
 
       isLoading.value = true;
-      store.commit("SET_LAST_LOADED", Date.now());
 
-      await readAndParseMaps();
+      await readAndParseMaps(force);
 
       isLoading.value = false;
     };
