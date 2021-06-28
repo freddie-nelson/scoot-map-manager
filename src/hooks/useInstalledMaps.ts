@@ -14,6 +14,7 @@ export default function () {
     try {
       folders = await readDir(mapsDir);
     } catch (error) {
+      console.log(error);
       return;
     }
 
@@ -62,6 +63,7 @@ export default function () {
       try {
         byteArr = new Uint8Array(await readBinaryFile(previewImage.path));
       } catch (error) {
+        console.log(error);
         return;
       }
 

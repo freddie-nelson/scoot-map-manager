@@ -51,7 +51,7 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from "vue";
-import { Map } from "@/store";
+import { Map, useStore } from "@/store";
 import {
   getFirestore,
   collection,
@@ -72,6 +72,7 @@ import SInputText from "@/components/shared/Input/SInputText.vue";
 import SMapList from "@/components/app/Map/SMapList.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
 import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
+import { createDir, writeBinaryFile } from "@tauri-apps/api/fs";
 
 export default defineComponent({
   name: "Maps",
@@ -83,6 +84,8 @@ export default defineComponent({
     SSpinnerBar,
   },
   setup() {
+    const store = useStore();
+
     const db = getFirestore();
     const mapsRef = collection(db, "maps");
     const pageNum = ref(0);
@@ -198,8 +201,41 @@ export default defineComponent({
 
     onBeforeMount(nextPage);
 
-    const installMap = (map: Map) => {
-      console.log(map);
+    const installMap = async (map: Map) => {
+      let image: ArrayBuffer;
+      try {
+        image = await fetch(map.image).then((res) => res.arrayBuffer());
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+
+      let parkFile: ArrayBuffer;
+      try {
+        parkFile = await fetch(map.parkFile).then((res) => res.arrayBuffer());
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+
+      const mapDir = `${store.state.mapsDir.dir}/${map.name}`;
+
+      try {
+        await createDir(mapDir, { recursive: true });
+        await writeBinaryFile({
+          contents: image,
+          path: `${mapDir}/ParkCapture.png`,
+        });
+        await writeBinaryFile({
+          contents: parkFile,
+          path: `${mapDir}/ObjectInfo.ScootPark`,
+        });
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+
+      console.log("saved map");
     };
 
     const searchTerm = ref("");
