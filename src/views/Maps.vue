@@ -1,5 +1,5 @@
 <template>
-  <main class="overflow-y-scroll">
+  <main class="overflow-y-scroll relative">
     <header class="mb-11 flex justify-between items-center">
       <s-gradient-heading :size="4">Global Maps</s-gradient-heading>
 
@@ -26,7 +26,7 @@
       <s-map-list
         v-if="maps.length > 0"
         :maps="maps"
-        @map-clicked="installMap(maps[$event])"
+        @map-clicked="downloadMap(maps[$event])"
       />
       <h1 v-else class="font-semibold text-2xl text-center py-10 opacity-60">
         You've reached the end, how about adding your own map?
@@ -44,6 +44,40 @@
         <s-button @click="nextPage" class="py-1.5 w-10 h-full text-4xl">
           &#8250;
         </s-button>
+      </div>
+    </div>
+
+    <!-- download modal -->
+    <div
+      v-if="isDownloading"
+      class="
+        absolute
+        top-0
+        left-0
+        w-full
+        h-full
+        flex
+        justify-center
+        items-center
+        bg-bg-dark bg-opacity-70
+      "
+    >
+      <div
+        class="
+          flex flex-col
+          justify-center
+          items-center
+          max-w-2xl
+          w-full
+          p-12
+          rounded-lg
+          bg-input-focus
+        "
+      >
+        <s-gradient-heading class="mb-5" :size="4" noScale
+          >Downloading Map...</s-gradient-heading
+        >
+        <s-spinner-bar class="h-4 w-full" />
       </div>
     </div>
   </main>
@@ -201,7 +235,16 @@ export default defineComponent({
 
     onBeforeMount(nextPage);
 
-    const installMap = async (map: Map) => {
+    const isDownloading = ref(false);
+    const downloadMap = async (map: Map) => {
+      isDownloading.value = true;
+
+      await fetchAndSaveMap(map);
+
+      isDownloading.value = false;
+    };
+
+    const fetchAndSaveMap = async (map: Map) => {
       let image: ArrayBuffer;
       try {
         image = await fetch(map.image).then((res) => res.arrayBuffer());
@@ -249,7 +292,8 @@ export default defineComponent({
       isLoading,
       nextPage,
       previousPage,
-      installMap,
+      isDownloading,
+      downloadMap,
       searchTerm,
       search,
     };
