@@ -69,7 +69,7 @@ export default defineComponent({
     const submitDir = async () => {
       try {
         const res = await fs.readDir(gameDir.value);
-        if (res.length === 0) return;
+        if (!res) return;
 
         store.commit("SET_GAME_DIR", pathParse(gameDir.value));
         router.push({ name: "Installed" });

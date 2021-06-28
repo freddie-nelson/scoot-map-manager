@@ -6,14 +6,6 @@
       @submit.prevent="registerAccount"
     >
       <s-input-text
-        name="username"
-        placeholder="johnsmith16"
-        label="Username"
-        v-model="username"
-      />
-
-      <s-input-text
-        class="mt-6"
         name="email"
         placeholder="johnsmith@example.com"
         label="Email"
@@ -82,7 +74,6 @@ export default defineComponent({
     const auth = getAuth();
 
     const email = ref("");
-    const username = ref("");
     const password = ref("");
     const confirmPassword = ref("");
     const error = ref("");
@@ -112,7 +103,6 @@ export default defineComponent({
 
     return {
       email,
-      username,
       password,
       confirmPassword,
       error,

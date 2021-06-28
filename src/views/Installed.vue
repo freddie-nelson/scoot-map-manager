@@ -7,10 +7,11 @@
         <s-button
           @click="$router.push({ name: 'Setup' })"
           class="transform scale-90"
-          >Locate Folder
+        >
+          Locate Folder
         </s-button>
-        <s-button @click="loadMaps(true)" class="ml-5 transform scale-90"
-          >Refresh Maps
+        <s-button @click="loadMaps(true)" class="ml-5 transform scale-90">
+          Refresh Maps
         </s-button>
       </div>
     </header>
@@ -22,14 +23,32 @@
       <s-spinner-bar class="h-5 mt-10 w-full max-w-2xl px-8 mx-auto" />
     </div>
 
-    <s-map-list
-      v-else
-      :maps="$store.state.installedMaps"
-      :buttonIcon="icons.trash"
-      :buttonIcon2="icons.upload"
-      @map-clicked="deleteMap"
-      @map-clicked-2="uploadMap"
-    />
+    <div v-else>
+      <s-map-list
+        v-if="$store.state.installedMaps.length > 0"
+        :maps="$store.state.installedMaps"
+        :buttonIcon="icons.trash"
+        :buttonIcon2="icons.upload"
+        @map-clicked="deleteMap"
+        @map-clicked-2="uploadMap"
+      />
+
+      <h1 v-else class="font-semibold text-2xl text-center py-10 opacity-60">
+        You don't have any maps installed,
+        <router-link
+          class="
+            cursor-pointer
+            text-primary-500
+            hover:text-accent-500
+            transtion-colors
+            duration-300
+            underline
+          "
+          to="Maps"
+          >Download some made by other users!</router-link
+        >
+      </h1>
+    </div>
   </main>
 </template>
 
