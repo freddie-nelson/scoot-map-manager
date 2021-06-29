@@ -74,9 +74,9 @@
           bg-input-focus
         "
       >
-        <s-gradient-heading class="mb-5" :size="4" noScale
-          >Downloading Map...</s-gradient-heading
-        >
+        <s-gradient-heading class="mb-5" :size="4" noScale>
+          Downloading Map...
+        </s-gradient-heading>
         <s-spinner-bar class="h-4 w-full" />
       </div>
     </div>

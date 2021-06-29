@@ -24,12 +24,10 @@ const auth = getAuth();
 auth.setPersistence(browserLocalPersistence);
 
 auth.onAuthStateChanged(() => {
-  if (!auth.currentUser) return;
+  store.commit("SET_USER", auth.currentUser || undefined);
 
-  store.commit("SET_USER", auth.currentUser);
-
-  if (router.currentRoute.value.name?.toString().match(/(Login)|(Register)/))
-    router.push({ name: "Profile" });
+  if (auth.currentUser) router.push({ name: "Profile" });
+  else router.push({ name: "Login" });
 });
 
 const app = createApp(App);
