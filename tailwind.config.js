@@ -49,6 +49,7 @@ module.exports = {
         primary: colors.cyan,
         accent: brandGreen,
         danger: colors.red,
+        success: colors.lime,
         "bg-dark": brandBlack[900],
         "bg-light": brandBlack[100],
         "t-main": brandBlack[100],
