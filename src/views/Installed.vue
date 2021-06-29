@@ -16,7 +16,7 @@
       </div>
     </header>
 
-    <div v-if="isLoading">
+    <div v-if="$store.state.isLoadingInstalled">
       <s-gradient-heading class="text-center mt-32" :size="5">
         Loading Maps...
       </s-gradient-heading>
@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref } from "vue";
+import { defineComponent, onBeforeMount } from "vue";
 import useInstalledMaps from "@/hooks/useInstalledMaps";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
@@ -63,6 +63,7 @@ import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 
 import trashIcon from "@iconify-icons/feather/trash";
 import uploadIcon from "@iconify-icons/feather/upload";
+import { useStore } from "@/store";
 
 export default defineComponent({
   name: "Installed",
@@ -73,25 +74,23 @@ export default defineComponent({
     SSpinnerBar,
   },
   setup() {
+    const store = useStore();
     const { readAndParseMaps, deleteMap, uploadMap } = useInstalledMaps();
 
-    const isLoading = ref(false);
-
     const loadMaps = async (force = false) => {
-      if (isLoading.value) return;
+      if (store.state.isLoadingInstalled) return;
 
-      isLoading.value = true;
+      store.commit("SET_LOADING_INSTALLED", true);
 
       await readAndParseMaps(force);
 
-      isLoading.value = false;
+      store.commit("SET_LOADING_INSTALLED", false);
     };
 
     onBeforeMount(loadMaps);
 
     return {
       loadMaps,
-      isLoading,
       deleteMap,
       uploadMap,
       icons: {

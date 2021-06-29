@@ -23,6 +23,7 @@ export interface State {
   gameDir: ParsedPath;
   mapsDir: ParsedPath;
   installedMaps: Map[];
+  isLoadingInstalled: boolean;
   lastLoadedMaps: number;
 }
 
@@ -35,6 +36,7 @@ const store = createStore<State>({
     gameDir: gameDir,
     mapsDir: gameDir,
     installedMaps: [],
+    isLoadingInstalled: false,
     lastLoadedMaps: 0,
   },
   mutations: {
@@ -66,6 +68,9 @@ const store = createStore<State>({
       state.installedMaps.splice(index, 1);
     },
 
+    SET_LOADING_INSTALLED(state, b: boolean) {
+      state.isLoadingInstalled = b;
+    },
     SET_LAST_LOADED(state, time: number) {
       state.lastLoadedMaps = time;
     },
