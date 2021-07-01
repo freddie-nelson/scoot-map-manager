@@ -99,6 +99,10 @@ import {
   Query,
   endBefore,
   endAt,
+  increment,
+  doc,
+  updateDoc,
+  DocumentReference,
 } from "firebase/firestore";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
@@ -235,15 +239,6 @@ export default defineComponent({
 
     onBeforeMount(nextPage);
 
-    const isDownloading = ref(false);
-    const downloadMap = async (map: Map) => {
-      isDownloading.value = true;
-
-      await fetchAndSaveMap(map);
-
-      isDownloading.value = false;
-    };
-
     const fetchAndSaveMap = async (map: Map) => {
       let image: ArrayBuffer;
       try {
@@ -279,6 +274,37 @@ export default defineComponent({
       }
 
       console.log("saved map");
+    };
+
+    const incrementDownloadsCounter = async (map: Map) => {
+      // get map doc reference
+      let mapRef: DocumentReference<DocumentData>;
+      try {
+        mapRef = await doc(db, "maps", map.name);
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+
+      // update downloads
+      try {
+        await updateDoc(mapRef, {
+          downloads: increment(1),
+        });
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    };
+
+    const isDownloading = ref(false);
+    const downloadMap = async (map: Map) => {
+      isDownloading.value = true;
+
+      await fetchAndSaveMap(map);
+      await incrementDownloadsCounter(map);
+
+      isDownloading.value = false;
     };
 
     const searchTerm = ref("");

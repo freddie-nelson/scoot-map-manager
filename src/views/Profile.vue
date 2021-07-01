@@ -3,7 +3,9 @@
     <header class="mb-11 flex justify-between items-center">
       <s-gradient-heading :size="4">My Profile</s-gradient-heading>
 
-      <s-button-danger @click="signOut"> Sign Out </s-button-danger>
+      <s-button-danger class="transform scale-90" @click="signOut">
+        Sign Out
+      </s-button-danger>
     </header>
     <s-profile-info />
   </main>
