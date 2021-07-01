@@ -32,7 +32,7 @@
 <script lang="ts">
 import { Map, useStore } from "@/store";
 import { computed, defineComponent, onBeforeMount, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
 import ImageBlobReduce from "image-blob-reduce";
 const reduce = new ImageBlobReduce();
 
@@ -43,6 +43,7 @@ import {
   getFirestore,
   setDoc,
   DocumentData,
+  serverTimestamp,
 } from "@firebase/firestore";
 import {
   getStorage,
@@ -179,7 +180,7 @@ export default defineComponent({
         creatorId: store.state.user.uid,
         image: await getDownloadURL(imageRef),
         parkFile: await getDownloadURL(parkRef),
-        created_at: Date.now(),
+        created_at: serverTimestamp(),
       };
 
       try {
@@ -194,6 +195,10 @@ export default defineComponent({
       isUploading.value = false;
       router.push({ name: "Installed" });
     };
+
+    onBeforeRouteLeave(() => {
+      if (isUploading.value) return false;
+    });
 
     return {
       map,
