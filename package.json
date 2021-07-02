@@ -21,7 +21,8 @@
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0"
+    "vuex": "^4.0.0-0",
+    "wasm-imagemagick": "^1.2.8"
   },
   "devDependencies": {
     "@iconify/vue": "^2.0.0-rc.3",
