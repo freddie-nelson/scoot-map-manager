@@ -57,28 +57,33 @@ export default function () {
       const previewImage = files.find((f) => f.name === "ParkCapture.png");
       if (!previewImage) return;
 
-      // read image as binary
-      let byteArr: Uint8Array;
-
-      try {
-        byteArr = new Uint8Array(await readBinaryFile(previewImage.path));
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-
-      const blob = new Blob([byteArr], { type: "image/png" });
-
       // add map to maps
       store.commit("ADD_INSTALLED_MAP", {
         name: folder.name || `Map ${i}`,
         creator: "You",
-        image: URL.createObjectURL(blob),
+        image: "",
         parkFile: parkFile.path,
       });
 
-      store.commit("SET_LAST_LOADED", Date.now());
+      loadImage(previewImage, i - 1);
     }
+
+    store.commit("SET_LAST_LOADED", Date.now());
+  };
+
+  const loadImage = async (image: FileEntry, i: number) => {
+    let byteArr: Uint8Array;
+
+    try {
+      byteArr = new Uint8Array(await readBinaryFile(image.path));
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+
+    const blob = new Blob([byteArr], { type: "image/png" });
+
+    store.commit("ADD_MAP_IMAGE", { i, url: URL.createObjectURL(blob) });
   };
 
   const deleteMap = async (i: number) => {
