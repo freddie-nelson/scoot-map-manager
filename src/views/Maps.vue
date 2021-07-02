@@ -78,6 +78,7 @@ import {
   doc,
   updateDoc,
   DocumentReference,
+  where,
 } from "firebase/firestore";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
@@ -129,8 +130,8 @@ export default defineComponent({
       });
     };
 
-    let firstVisible: DocumentData;
-    let lastVisible: DocumentData;
+    let firstVisible: DocumentData | undefined;
+    let lastVisible: DocumentData | undefined;
 
     const setDocBoundaries = (docs: DocumentData[]) => {
       if (docs.length === 0) return;
@@ -298,8 +299,53 @@ export default defineComponent({
     });
 
     const searchTerm = ref("");
-    const search = () => {
-      console.log(searchTerm.value);
+    let lastSearchTerm = "";
+    let lastSearchTime = 0;
+    let recentSearchCount = 0;
+
+    const search = async () => {
+      // rate limit search client side
+      if (Date.now() - lastSearchTime < 3000) {
+        return;
+      } else if (Date.now() - lastSearchTime < 30000) {
+        recentSearchCount++;
+
+        if (recentSearchCount >= 5) {
+          // TODO implement toast warnings
+          return;
+        }
+      } else {
+        recentSearchCount = 0;
+      }
+
+      // early exits
+      if (searchTerm.value === "" && recentSearchCount < 5) {
+        pageNum.value = 0;
+        maps.value.length = 0;
+        lastVisible = undefined;
+        firstVisible = undefined;
+
+        lastSearchTime = Date.now();
+
+        return nextPage();
+      } else if (searchTerm.value === lastSearchTerm) return;
+
+      isLoading.value = true;
+
+      const q = query(
+        mapsRef,
+        where("name", ">=", searchTerm.value),
+        where("name", "<=", searchTerm.value + "\uf8ff") // uf8ff is super high value unicode char so everything that starts with searchTerm is found
+      );
+
+      const docs = await getDocs(q);
+
+      setDocBoundaries(docs.docs);
+      addDocsToMaps(docs.docs);
+
+      lastSearchTerm = searchTerm.value;
+      lastSearchTime = Date.now();
+      isLoading.value = false;
     };
 
     return {
