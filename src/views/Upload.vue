@@ -33,8 +33,7 @@
 import { Map, useStore } from "@/store";
 import { computed, defineComponent, onBeforeMount, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
-import ImageBlobReduce from "image-blob-reduce";
-const reduce = new ImageBlobReduce();
+import { buildInputFile, Call } from "wasm-imagemagick";
 
 import { readTextFile } from "@tauri-apps/api/fs";
 import {
@@ -44,6 +43,8 @@ import {
   setDoc,
   DocumentData,
   serverTimestamp,
+  DocumentReference,
+  deleteDoc,
 } from "@firebase/firestore";
 import {
   getStorage,
@@ -51,6 +52,7 @@ import {
   uploadBytes,
   StorageReference,
   getDownloadURL,
+  deleteObject,
 } from "@firebase/storage";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
@@ -126,11 +128,34 @@ export default defineComponent({
       if (!map.value || !store.state.user || !(await isNameValid())) return;
       isUploading.value = true;
 
+      // read image in
       let image: Blob;
       try {
-        image = await reduce.toBlob(
-          await fetch(map.value.image).then((r) => r.blob()),
-          500
+        // convert image to jpeg and compress
+        const outputFiles = await Call(
+          [await buildInputFile(map.value.image, "image.png")],
+          [
+            "convert",
+            "image.png",
+            "-strip",
+            "-interlace",
+            "Plane",
+            "-gaussian-blur",
+            "0.05",
+            "-quality",
+            "70%",
+            "-resize",
+            "900x900",
+            "result.jpg",
+          ]
+        );
+
+        if (!outputFiles[0]) throw new Error("Failed to convert image to jpg");
+
+        image = outputFiles[0].blob.slice(
+          0,
+          outputFiles[0].blob.size,
+          "image/jpeg"
         );
       } catch (error) {
         console.log(error);
@@ -155,16 +180,19 @@ export default defineComponent({
       const parkFile = new Blob([parkJSON], { type: "application/json" });
 
       // upload files to cloud storage
-      let imageRef: StorageReference;
-      let parkRef: StorageReference;
+      let imageRef: StorageReference | undefined;
+      let parkRef: StorageReference | undefined;
       try {
-        imageRef = storageRef(capturesRef, `${map.value.name}.png`);
+        imageRef = storageRef(capturesRef, `${map.value.name}.jpg`);
         await uploadBytes(imageRef, image);
 
         parkRef = storageRef(parksRef, `${map.value.name}.ScootPark`);
         await uploadBytes(parkRef, parkFile);
       } catch (error) {
         console.log(error);
+
+        await cleanupUploadFail([imageRef, parkRef]);
+
         uploadFailed.value = true;
         isUploading.value = false;
         return;
@@ -187,6 +215,12 @@ export default defineComponent({
         await setDoc(doc(db, "maps", map.value.name), docData);
       } catch (error) {
         console.log(error);
+
+        await cleanupUploadFail(
+          [imageRef, parkRef],
+          doc(db, "maps", map.value.name)
+        );
+
         uploadFailed.value = true;
         isUploading.value = false;
         return;
@@ -194,6 +228,31 @@ export default defineComponent({
 
       isUploading.value = false;
       router.push({ name: "Installed" });
+    };
+
+    const cleanupUploadFail = async (
+      files: (StorageReference | undefined)[],
+      doc?: DocumentReference<DocumentData>
+    ) => {
+      for (const file of files) {
+        if (!file) continue;
+
+        try {
+          await deleteObject(file);
+        } catch (error) {
+          console.log(error);
+          continue;
+        }
+      }
+
+      if (!doc) return;
+
+      try {
+        await deleteDoc(doc);
+      } catch (error) {
+        console.log(error);
+        return;
+      }
     };
 
     onBeforeRouteLeave(() => {

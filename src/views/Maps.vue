@@ -111,6 +111,7 @@ import SMapList from "@/components/app/Map/SMapList.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
 import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 import { createDir, writeBinaryFile } from "@tauri-apps/api/fs";
+import { buildInputFile, Call } from "wasm-imagemagick";
 
 export default defineComponent({
   name: "Maps",
@@ -142,6 +143,7 @@ export default defineComponent({
           name: data.name,
           creator: data.creator,
           image: data.image,
+          imageEscaped: data.image.replace(/'|"|`|\(|\)|\[|\]/g, "\\$&"),
           parkFile: data.parkFile,
           downloads: data.downloads || 0,
         };
@@ -242,7 +244,14 @@ export default defineComponent({
     const fetchAndSaveMap = async (map: Map) => {
       let image: ArrayBuffer;
       try {
-        image = await fetch(map.image).then((res) => res.arrayBuffer());
+        const outputFiles = await Call(
+          [await buildInputFile(map.image, "image.jpg")],
+          ["convert", "image.jpg", "-resize", "1200x1200", "image.png"]
+        );
+
+        if (!outputFiles[0]) throw new Error("Failed to convert image to png.");
+
+        image = await outputFiles[0].blob.arrayBuffer();
       } catch (error) {
         console.log(error);
         return;

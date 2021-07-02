@@ -12,7 +12,7 @@
   >
     <div
       class="w-full h-full rounded-md bg-input-focus bg-cover"
-      :style="{ backgroundImage: `url(${map.image})` }"
+      :style="{ backgroundImage: `url(${map.imageEscaped || map.image})` }"
     />
 
     <div

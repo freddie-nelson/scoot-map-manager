@@ -7,10 +7,11 @@ export interface Toast {
 }
 
 export interface Map {
-  image: string;
   name: string;
-  parkFile: string;
   creator: string;
+  parkFile: string;
+  image: string;
+  imageEscaped?: string;
   downloads?: number;
   docId?: string;
 }
@@ -63,6 +64,9 @@ const store = createStore<State>({
     },
     ADD_INSTALLED_MAP(state, map: Map) {
       state.installedMaps.push(map);
+    },
+    ADD_MAP_IMAGE(state, { i, url }: { i: number; url: string }) {
+      state.installedMaps[i].image = url;
     },
     REMOVE_INSTALLED_MAP(state, index: number) {
       state.installedMaps.splice(index, 1);
