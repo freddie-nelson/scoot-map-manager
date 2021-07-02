@@ -48,44 +48,19 @@
     </div>
 
     <!-- download modal -->
-    <div
-      v-if="isDownloading"
-      class="
-        absolute
-        top-0
-        left-0
-        w-full
-        h-full
-        flex
-        justify-center
-        items-center
-        bg-bg-dark bg-opacity-70
-      "
-    >
-      <div
-        class="
-          flex flex-col
-          justify-center
-          items-center
-          max-w-2xl
-          w-full
-          p-12
-          rounded-lg
-          bg-input-focus
-        "
-      >
-        <s-gradient-heading class="mb-5" :size="4" noScale>
-          Downloading Map...
-        </s-gradient-heading>
-        <s-spinner-bar class="h-4 w-full" />
-      </div>
-    </div>
+    <s-modal v-if="isDownloading">
+      <s-gradient-heading class="mb-5" :size="4" noScale>
+        Downloading Map...
+      </s-gradient-heading>
+      <s-spinner-bar class="h-4 w-full" />
+    </s-modal>
   </main>
 </template>
 
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from "vue";
 import { Map, useStore } from "@/store";
+import { onBeforeRouteLeave } from "vue-router";
 import {
   getFirestore,
   collection,
@@ -112,6 +87,7 @@ import SButton from "@/components/shared/Button/SButton.vue";
 import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 import { createDir, writeBinaryFile } from "@tauri-apps/api/fs";
 import { buildInputFile, Call } from "wasm-imagemagick";
+import SModal from "@/components/shared/Modal/SModal.vue";
 
 export default defineComponent({
   name: "Maps",
@@ -121,6 +97,7 @@ export default defineComponent({
     SMapList,
     SButton,
     SSpinnerBar,
+    SModal,
   },
   setup() {
     const store = useStore();
@@ -315,6 +292,10 @@ export default defineComponent({
 
       isDownloading.value = false;
     };
+
+    onBeforeRouteLeave(() => {
+      if (isDownloading.value) return false;
+    });
 
     const searchTerm = ref("");
     const search = () => {

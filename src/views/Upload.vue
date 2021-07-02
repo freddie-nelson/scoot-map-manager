@@ -84,6 +84,8 @@ export default defineComponent({
 
     onBeforeMount(() => {
       if (!store.state.user) return router.push({ name: "Register" });
+      else if (!store.state.user.emailVerified)
+        return router.push({ name: "Profile" });
       else if (store.state.installedMaps.length === 0)
         return router.push({ name: "Installed" });
 

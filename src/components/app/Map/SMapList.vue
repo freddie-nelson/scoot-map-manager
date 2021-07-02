@@ -2,7 +2,7 @@
   <section class="max-h-full">
     <s-map-card
       v-for="(map, i) in maps"
-      :key="i"
+      :key="`${i}-${map.name}`"
       :map="map"
       :buttonIcon="buttonIcon"
       :buttonIcon2="buttonIcon2"

@@ -1,5 +1,5 @@
 <template>
-  <main class="flex flex-col justify-center items-center">
+  <main v-if="!isLoading" class="flex flex-col justify-center items-center">
     <s-gradient-heading :size="6" noscale>Register</s-gradient-heading>
     <form
       class="max-w-xl w-full px-4 mt-10 flex flex-col"
@@ -47,6 +47,13 @@
       </s-button-text>
     </form>
   </main>
+
+  <main v-else class="flex flex-col justify-center items-center">
+    <s-gradient-heading :size="6" noscale
+      >Creating account...</s-gradient-heading
+    >
+    <s-spinner-bar class="mt-14 h-4 w-full max-w-3xl px-6" />
+  </main>
 </template>
 
 <script lang="ts">
@@ -59,6 +66,7 @@ import SInputPassword from "@/components/shared/Input/SInputPassword.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
 import SButtonText from "@/components/shared/Button/SButtonText.vue";
 import SFormError from "@/components/shared/Form/SFormError.vue";
+import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 
 export default defineComponent({
   name: "Register",
@@ -69,6 +77,7 @@ export default defineComponent({
     SButton,
     SButtonText,
     SFormError,
+    SSpinnerBar,
   },
   setup() {
     const auth = getAuth();
@@ -82,9 +91,7 @@ export default defineComponent({
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     const isEmailValid = computed(() => emailRegex.test(email.value));
 
-    // const usernameTaken = computed(() => {
-
-    // })
+    const isLoading = ref(false);
 
     const registerAccount = async () => {
       if (
@@ -94,11 +101,15 @@ export default defineComponent({
       )
         return;
 
+      isLoading.value = true;
+
       try {
         await createUserWithEmailAndPassword(auth, email.value, password.value);
       } catch (e) {
         error.value = e.message;
       }
+
+      isLoading.value = false;
     };
 
     return {
@@ -107,6 +118,7 @@ export default defineComponent({
       confirmPassword,
       error,
       isEmailValid,
+      isLoading,
       registerAccount,
     };
   },
