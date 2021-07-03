@@ -1,7 +1,7 @@
 <template>
   <main class="overflow-y-scroll relative">
     <header class="mb-11 flex justify-between items-center">
-      <s-gradient-heading :size="4">Global Maps</s-gradient-heading>
+      <s-gradient-heading :size="4">User Made Maps</s-gradient-heading>
 
       <div class="flex">
         <s-input-text
@@ -11,7 +11,9 @@
           placeholder="Search..."
           @keyup.enter="search"
         />
-        <s-button class="ml-2.5 py-3 h-full" @click="search">Search</s-button>
+        <s-button class="ml-2.5 py-3 h-full" @click="search(searchTerm)"
+          >Search</s-button
+        >
       </div>
     </header>
 
@@ -59,36 +61,16 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from "vue";
-import { Map, useStore } from "@/store";
 import { onBeforeRouteLeave } from "vue-router";
-import {
-  getFirestore,
-  collection,
-  query,
-  orderBy,
-  startAfter,
-  limit,
-  getDocs,
-  QuerySnapshot,
-  DocumentData,
-  Query,
-  endBefore,
-  endAt,
-  increment,
-  doc,
-  updateDoc,
-  DocumentReference,
-  where,
-} from "firebase/firestore";
+import useUserMaps from "@/hooks/useUserMaps";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
 import SInputText from "@/components/shared/Input/SInputText.vue";
 import SMapList from "@/components/app/Map/SMapList.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
 import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
-import { createDir, writeBinaryFile } from "@tauri-apps/api/fs";
-import { buildInputFile, Call } from "wasm-imagemagick";
 import SModal from "@/components/shared/Modal/SModal.vue";
+import { Map } from "@/store";
 
 export default defineComponent({
   name: "Maps",
@@ -101,252 +83,24 @@ export default defineComponent({
     SModal,
   },
   setup() {
-    const store = useStore();
-
-    const db = getFirestore();
-    const mapsRef = collection(db, "maps");
-    const pageNum = ref(0);
-    const perPage = ref(25);
-
     const maps = ref<Map[]>([]);
-    const isLoading = ref(false);
+    const searchTerm = ref("");
 
-    const addDocsToMaps = (docs: DocumentData[]) => {
-      maps.value = [];
-
-      docs.forEach((doc) => {
-        const data = doc.data();
-
-        const map: Map = {
-          name: data.name,
-          creator: data.creator,
-          image: data.image,
-          imageEscaped: data.image.replace(/'|"|`|\(|\)|\[|\]/g, "\\$&"),
-          parkFile: data.parkFile,
-          downloads: data.downloads || 0,
-        };
-
-        maps.value.push(map);
-      });
-    };
-
-    let firstVisible: DocumentData | undefined;
-    let lastVisible: DocumentData | undefined;
-
-    const setDocBoundaries = (docs: DocumentData[]) => {
-      if (docs.length === 0) return;
-
-      firstVisible = docs[0];
-      lastVisible = docs[docs.length - 1];
-    };
-
-    const fetchNextMaps = async () => {
-      let q: Query<DocumentData>;
-      if (!lastVisible) {
-        q = query(mapsRef, orderBy("created_at", "desc"), limit(perPage.value));
-      } else {
-        q = query(
-          mapsRef,
-          orderBy("created_at", "desc"),
-          startAfter(lastVisible),
-          limit(perPage.value)
-        );
-      }
-
-      let docs: QuerySnapshot<DocumentData>;
-      try {
-        docs = await getDocs(q);
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-
-      setDocBoundaries(docs.docs);
-      addDocsToMaps(docs.docs);
-    };
-
-    const fetchPreviousMaps = async () => {
-      let q: Query<DocumentData>;
-      if (maps.value.length === 0) {
-        q = query(
-          mapsRef,
-          orderBy("created_at", "desc"),
-          endAt(lastVisible),
-          limit(perPage.value)
-        );
-      } else {
-        q = query(
-          mapsRef,
-          orderBy("created_at", "desc"),
-          endBefore(firstVisible),
-          limit(perPage.value)
-        );
-      }
-
-      let docs: QuerySnapshot<DocumentData>;
-      try {
-        docs = await getDocs(q);
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-
-      setDocBoundaries(docs.docs);
-      addDocsToMaps(docs.docs);
-    };
-
-    const nextPage = async () => {
-      if (maps.value.length === 0 && pageNum.value !== 0) return;
-
-      pageNum.value++;
-      isLoading.value = true;
-
-      await fetchNextMaps();
-
-      isLoading.value = false;
-    };
-
-    const previousPage = async () => {
-      if (pageNum.value === 1) return;
-
-      pageNum.value--;
-      isLoading.value = true;
-
-      await fetchPreviousMaps();
-
-      isLoading.value = false;
-    };
+    const {
+      isLoading,
+      nextPage,
+      previousPage,
+      isDownloading,
+      downloadMap,
+      search,
+      pageNum,
+    } = useUserMaps(maps);
 
     onBeforeMount(nextPage);
-
-    const fetchAndSaveMap = async (map: Map) => {
-      let image: ArrayBuffer;
-      try {
-        const outputFiles = await Call(
-          [await buildInputFile(map.image, "image.jpg")],
-          ["convert", "image.jpg", "-resize", "1200x1200", "image.png"]
-        );
-
-        if (!outputFiles[0]) throw new Error("Failed to convert image to png.");
-
-        image = await outputFiles[0].blob.arrayBuffer();
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-
-      let parkFile: ArrayBuffer;
-      try {
-        parkFile = await fetch(map.parkFile).then((res) => res.arrayBuffer());
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-
-      const mapDir = `${store.state.mapsDir.dir}/${map.name}`;
-
-      try {
-        await createDir(mapDir, { recursive: true });
-        await writeBinaryFile({
-          contents: image,
-          path: `${mapDir}/ParkCapture.png`,
-        });
-        await writeBinaryFile({
-          contents: parkFile,
-          path: `${mapDir}/ObjectInfo.ScootPark`,
-        });
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-
-      console.log("saved map");
-    };
-
-    const incrementDownloadsCounter = async (map: Map) => {
-      // get map doc reference
-      let mapRef: DocumentReference<DocumentData>;
-      try {
-        mapRef = await doc(db, "maps", map.name);
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-
-      // update downloads
-      try {
-        await updateDoc(mapRef, {
-          downloads: increment(1),
-        });
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-    };
-
-    const isDownloading = ref(false);
-    const downloadMap = async (map: Map) => {
-      isDownloading.value = true;
-
-      await fetchAndSaveMap(map);
-      await incrementDownloadsCounter(map);
-
-      isDownloading.value = false;
-    };
 
     onBeforeRouteLeave(() => {
       if (isDownloading.value) return false;
     });
-
-    const searchTerm = ref("");
-    let lastSearchTerm = "";
-    let lastSearchTime = 0;
-    let recentSearchCount = 0;
-
-    const search = async () => {
-      // rate limit search client side
-      if (Date.now() - lastSearchTime < 3000) {
-        return;
-      } else if (Date.now() - lastSearchTime < 30000) {
-        recentSearchCount++;
-
-        if (recentSearchCount >= 5) {
-          // TODO implement toast warnings
-          return;
-        }
-      } else {
-        recentSearchCount = 0;
-      }
-
-      // early exits
-      if (searchTerm.value === "" && recentSearchCount < 5) {
-        pageNum.value = 0;
-        maps.value.length = 0;
-        lastVisible = undefined;
-        firstVisible = undefined;
-
-        lastSearchTime = Date.now();
-
-        return nextPage();
-      } else if (searchTerm.value === lastSearchTerm) return;
-
-      isLoading.value = true;
-
-      const q = query(
-        mapsRef,
-        where("name", ">=", searchTerm.value),
-        where("name", "<=", searchTerm.value + "\uf8ff") // uf8ff is super high value unicode char so everything that starts with searchTerm is found
-      );
-
-      const docs = await getDocs(q);
-
-      setDocBoundaries(docs.docs);
-      addDocsToMaps(docs.docs);
-
-      lastSearchTerm = searchTerm.value;
-      lastSearchTime = Date.now();
-      isLoading.value = false;
-    };
 
     return {
       pageNum,
