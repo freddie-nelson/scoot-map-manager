@@ -26,7 +26,9 @@
     </router-link>
     <router-link
       class="block hover:text-accent-100 transition-colors duration-300"
-      :class="{ 'text-accent-100': $route.name === 'Installed' }"
+      :class="{
+        'text-accent-100': $route.name && $route.name.includes('Installed'),
+      }"
       to="/installed"
     >
       <Icon class="w-full h-full" :icon="icons.folder" />

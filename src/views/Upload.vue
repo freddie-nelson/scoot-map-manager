@@ -185,11 +185,15 @@ export default defineComponent({
       let imageRef: StorageReference | undefined;
       let parkRef: StorageReference | undefined;
       try {
+        const metadata = {
+          customMetadata: { creatorId: store.state.user.uid },
+        };
+
         imageRef = storageRef(capturesRef, `${map.value.name}.jpg`);
-        await uploadBytes(imageRef, image);
+        await uploadBytes(imageRef, image, metadata);
 
         parkRef = storageRef(parksRef, `${map.value.name}.ScootPark`);
-        await uploadBytes(parkRef, parkFile);
+        await uploadBytes(parkRef, parkFile, metadata);
       } catch (error) {
         console.log(error);
 

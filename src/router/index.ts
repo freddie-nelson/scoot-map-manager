@@ -1,7 +1,9 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import Home from "@/views/Home.vue";
 import Maps from "@/views/Maps.vue";
-import Installed from "@/views/Installed.vue";
+import Installed from "@/views/Installed/Installed.vue";
+import InstalledRoot from "@/views/Installed/Root.vue";
+import InstalledUploaded from "@/views/Installed/Uploaded.vue";
 import Profile from "@/views/Profile.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
@@ -23,8 +25,19 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/installed",
-    name: "Installed",
     component: Installed,
+    children: [
+      {
+        path: "",
+        name: "Installed",
+        component: InstalledRoot,
+      },
+      {
+        path: "uploaded",
+        name: "InstalledUploaded",
+        component: InstalledUploaded,
+      },
+    ],
   },
   {
     path: "/profile",

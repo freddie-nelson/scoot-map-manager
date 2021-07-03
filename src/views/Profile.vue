@@ -1,6 +1,6 @@
 <template>
   <main>
-    <s-modal v-if="!$store.state.user.emailVerified">
+    <s-modal v-if="$store.state.user && !$store.state.user.emailVerified">
       <s-gradient-heading :size="5" noScale>Verify Email</s-gradient-heading>
       <p v-if="verifyTimer === 0" class="mt-3 text-lg font-medium">
         You must verify your email before continuing.

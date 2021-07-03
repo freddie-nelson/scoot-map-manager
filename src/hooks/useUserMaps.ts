@@ -1,6 +1,5 @@
-import { onBeforeMount, Ref, ref } from "vue";
-import { Map, useStore } from "@/store";
-import { onBeforeRouteLeave } from "vue-router";
+import { Ref, ref } from "vue";
+import store, { Map } from "@/store";
 import {
   getFirestore,
   collection,
@@ -19,16 +18,18 @@ import {
   updateDoc,
   DocumentReference,
   where,
+  deleteDoc,
 } from "firebase/firestore";
+import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 import { createDir, writeBinaryFile } from "@tauri-apps/api/fs";
 import { buildInputFile, Call } from "wasm-imagemagick";
 
-const store = useStore();
-
-const db = getFirestore();
-const mapsRef = collection(db, "maps");
-
 export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
+  const storage = getStorage();
+
+  const db = getFirestore();
+  const mapsRef = collection(db, "maps");
+
   const pageNum = ref(startPage);
   const perPage = ref(mapsPerPage);
 
@@ -233,7 +234,7 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
 
     let q: Query;
     if (searchTerm.startsWith("creatorId:")) {
-      q = query(mapsRef, where("creatorId", "==", searchTerm.substring("creatorId".length)));
+      q = query(mapsRef, where("creatorId", "==", searchTerm.substring("creatorId:".length)));
     } else {
       q = query(
         mapsRef,
@@ -254,6 +255,21 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
     isLoading.value = false;
   };
 
+  const deleteMap = async (map: Map) => {
+    try {
+      await Promise.all([
+        deleteDoc(doc(db, "maps", map.name)),
+        deleteObject(storageRef(storage, `captures/${map.name}.jpg`)),
+        deleteObject(storageRef(storage, `parkfiles/${map.name}.ScootPark`)),
+      ]);
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+
+    return true;
+  };
+
   return {
     isLoading,
     nextPage,
@@ -263,6 +279,8 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
     downloadMap,
 
     search,
+
+    deleteMap,
 
     pageNum,
   };

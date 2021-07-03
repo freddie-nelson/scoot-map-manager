@@ -10,8 +10,6 @@ pub struct Metadata<M: Params> {
 #[tauri::command]
 // this will be accessible with `invoke('plugin:metadata|get_last_modified')`.
 fn get_last_modified(file: String) -> Result<u64, u64> {
-  println!("get_last_modified ran");
-
   if let Ok(metadata) = fs::metadata(file) {
     if let Ok(time) = metadata.modified() {
       let since_the_epoch = time

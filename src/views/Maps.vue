@@ -1,7 +1,7 @@
 <template>
   <main class="overflow-y-scroll relative">
     <header class="mb-11 flex justify-between items-center">
-      <s-gradient-heading :size="4">User Made Maps</s-gradient-heading>
+      <s-gradient-heading :size="4">Global Maps</s-gradient-heading>
 
       <div class="flex">
         <s-input-text
