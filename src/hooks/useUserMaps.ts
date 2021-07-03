@@ -274,9 +274,13 @@ export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage 
 
     isLoading.value = true;
 
-    const docs = await getDocs(q);
-
-    addDocsToMaps(docs.docs);
+    try {
+      const docs = await getDocs(q);
+      addDocsToMaps(docs.docs);
+    } catch (error) {
+      console.log(error);
+      return;
+    }
 
     lastSearchTerm = searchTerm;
     lastSearchTime = Date.now();

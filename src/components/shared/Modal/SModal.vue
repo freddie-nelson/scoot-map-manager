@@ -15,17 +15,35 @@
     :style="{ top: top + 'px' }"
   >
     <div
+      v-bind="$attrs"
       class="
         flex flex-col
         justify-center
         items-center
-        max-w-2xl
-        w-full
         p-12
         rounded-lg
         bg-input-focus
+        relative
       "
     >
+      <button
+        v-if="closeable"
+        class="
+          absolute
+          top-4
+          right-4
+          w-7
+          h-7
+          text-t-main
+          hover:text-primary-500
+          transition-colors
+          duration-300
+        "
+        @click="$emit('close')"
+      >
+        <Icon class="w-full h-full" :icon="icons.close" />
+      </button>
+
       <slot></slot>
     </div>
   </div>
@@ -34,9 +52,21 @@
 <script lang="ts">
 import { defineComponent, onMounted, onBeforeUnmount, ref } from "vue";
 
+import { Icon } from "@iconify/vue";
+import closeIcon from "@iconify-icons/feather/x";
+
 export default defineComponent({
   name: "SModal",
-  components: {},
+  inheritAttrs: false,
+  components: {
+    Icon,
+  },
+  props: {
+    closeable: {
+      type: Boolean,
+      default: false,
+    },
+  },
   setup() {
     const top = ref(0);
 
@@ -52,6 +82,10 @@ export default defineComponent({
 
     return {
       top,
+
+      icons: {
+        close: closeIcon,
+      },
     };
   },
 });

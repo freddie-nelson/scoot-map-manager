@@ -80,6 +80,7 @@
         </button>
 
         <button
+          v-if="buttonIcon"
           class="
             w-6
             h-6

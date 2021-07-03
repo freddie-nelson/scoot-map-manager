@@ -59,7 +59,7 @@
     </div>
 
     <!-- download modal -->
-    <s-modal v-if="isDownloading">
+    <s-modal v-if="isDownloading" class="max-w-2xl w-full">
       <s-gradient-heading class="mb-5" :size="4" noScale>
         Downloading Map...
       </s-gradient-heading>
