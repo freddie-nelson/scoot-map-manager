@@ -21,6 +21,7 @@ import useUserMaps from "@/hooks/useUserMaps";
 import SMapList from "@/components/app/Map/SMapList.vue";
 
 import trashIcon from "@iconify-icons/feather/trash";
+import { onBeforeRouteLeave } from "vue-router";
 
 export default defineComponent({
   name: "name",
@@ -51,6 +52,11 @@ export default defineComponent({
     };
 
     onBeforeMount(loadMaps);
+
+    onBeforeRouteLeave(() => {
+      if (store.state.isLoadingInstalled)
+        store.commit("SET_LOADING_INSTALLED", false);
+    });
 
     return {
       maps,

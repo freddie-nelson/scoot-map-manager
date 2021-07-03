@@ -1,4 +1,4 @@
-import { Ref, ref } from "vue";
+import { Ref, ref, watch } from "vue";
 import store, { Map } from "@/store";
 import {
   getFirestore,
@@ -19,12 +19,23 @@ import {
   DocumentReference,
   where,
   deleteDoc,
+  OrderByDirection,
 } from "firebase/firestore";
 import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 import { createDir, writeBinaryFile } from "@tauri-apps/api/fs";
 import { buildInputFile, Call } from "wasm-imagemagick";
 
-export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
+export interface Order {
+  field: string;
+  dir: OrderByDirection;
+}
+
+const defaultOrder: Order = {
+  field: "created_at",
+  dir: "desc",
+};
+
+export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage = 0, mapsPerPage = 25) {
   const storage = getStorage();
 
   const db = getFirestore();
@@ -34,6 +45,19 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
   const perPage = ref(mapsPerPage);
 
   const isLoading = ref(false);
+  const order = ref(orderBy(startOrder.field, startOrder.dir));
+
+  const resetMaps = () => {
+    disablePageChange = false;
+    pageNum.value = 0;
+    maps.value.length = 0;
+    lastVisible.value = undefined;
+    firstVisible.value = undefined;
+
+    nextPage();
+  };
+
+  watch(order, resetMaps);
 
   const addDocsToMaps = (docs: DocumentData[]) => {
     maps.value = [];
@@ -67,9 +91,9 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
   const fetchNextMaps = async () => {
     let q: Query<DocumentData>;
     if (!lastVisible.value) {
-      q = query(mapsRef, orderBy("created_at", "desc"), limit(perPage.value));
+      q = query(mapsRef, order.value, limit(perPage.value));
     } else {
-      q = query(mapsRef, orderBy("created_at", "desc"), startAfter(lastVisible.value), limit(perPage.value));
+      q = query(mapsRef, order.value, startAfter(lastVisible.value), limit(perPage.value));
     }
 
     let docs: QuerySnapshot<DocumentData>;
@@ -87,9 +111,9 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
   const fetchPreviousMaps = async () => {
     let q: Query<DocumentData>;
     if (maps.value.length === 0) {
-      q = query(mapsRef, orderBy("created_at", "desc"), endAt(lastVisible.value), limit(perPage.value));
+      q = query(mapsRef, order.value, endAt(lastVisible.value), limit(perPage.value));
     } else {
-      q = query(mapsRef, orderBy("created_at", "desc"), endBefore(firstVisible.value), limit(perPage.value));
+      q = query(mapsRef, order.value, endBefore(firstVisible.value), limit(perPage.value));
     }
 
     let docs: QuerySnapshot<DocumentData>;
@@ -222,17 +246,12 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
     }
 
     // early exits
-    if (searchTerm === "") {
-      if (recentSearchCount < 5) {
-        disablePageChange = false;
-        pageNum.value = 0;
-        maps.value.length = 0;
-        lastVisible.value = undefined;
-        firstVisible.value = undefined;
-
+    if (!searchTerm) {
+      if (recentSearchCount < 5 && searchTerm !== lastSearchTerm) {
         lastSearchTime = Date.now();
+        lastSearchTerm = searchTerm;
 
-        nextPage();
+        resetMaps();
       }
 
       return;
@@ -280,6 +299,8 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
   };
 
   return {
+    order,
+
     isLoading,
     nextPage,
     previousPage,

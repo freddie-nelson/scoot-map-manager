@@ -1,3 +1,4 @@
+import { Order } from "@/hooks/useUserMaps";
 import { User } from "firebase/auth";
 import pathParse from "path-parse";
 import { createStore, useStore as vuexUseStore } from "vuex";
@@ -26,6 +27,8 @@ export interface State {
   installedMaps: Map[];
   isLoadingInstalled: boolean;
   lastLoadedMaps: number;
+  globalMapsOrder?: Order;
+  globalMapsOrderName?: string;
 }
 
 const gameDirStr = window.localStorage.getItem("gameDir");
@@ -77,6 +80,11 @@ const store = createStore<State>({
     },
     SET_LAST_LOADED(state, time: number) {
       state.lastLoadedMaps = time;
+    },
+
+    SET_GLOBAL_MAPS_ORDER(state, { order, name }: { order: Order; name: string }) {
+      state.globalMapsOrder = order;
+      state.globalMapsOrderName = name;
     },
   },
   actions: {},

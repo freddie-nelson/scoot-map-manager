@@ -4,16 +4,25 @@
       <s-gradient-heading :size="4">Global Maps</s-gradient-heading>
 
       <div class="flex">
-        <s-input-text
-          class="w-96"
-          v-model="searchTerm"
-          name="search"
-          placeholder="Search..."
-          @keyup.enter="search"
+        <s-input-dropdown
+          class="mr-5 flex"
+          @selected="changeOrder"
+          :items="Object.keys(orders)"
+          :selected="selectedOrder"
         />
-        <s-button class="ml-2.5 py-3 h-full" @click="search(searchTerm)"
-          >Search</s-button
-        >
+
+        <div class="flex">
+          <s-input-text
+            class="w-96"
+            v-model="searchTerm"
+            name="search"
+            placeholder="Search..."
+            @keyup.enter="search"
+          />
+          <s-button class="ml-2.5 py-3 h-full" @click="search(searchTerm)"
+            >Search</s-button
+          >
+        </div>
       </div>
     </header>
 
@@ -62,7 +71,7 @@
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
-import useUserMaps from "@/hooks/useUserMaps";
+import useUserMaps, { Order } from "@/hooks/useUserMaps";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
 import SInputText from "@/components/shared/Input/SInputText.vue";
@@ -70,7 +79,13 @@ import SMapList from "@/components/app/Map/SMapList.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
 import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 import SModal from "@/components/shared/Modal/SModal.vue";
-import { Map } from "@/store";
+import { Map, useStore } from "@/store";
+import SInputDropdown from "@/components/shared/Input/SInputDropdown.vue";
+import { orderBy } from "@firebase/firestore";
+
+interface Orders {
+  [key: string]: Order;
+}
 
 export default defineComponent({
   name: "Maps",
@@ -81,12 +96,16 @@ export default defineComponent({
     SButton,
     SSpinnerBar,
     SModal,
+    SInputDropdown,
   },
   setup() {
+    const store = useStore();
+
     const maps = ref<Map[]>([]);
     const searchTerm = ref("");
 
     const {
+      order,
       isLoading,
       nextPage,
       previousPage,
@@ -94,13 +113,34 @@ export default defineComponent({
       downloadMap,
       search,
       pageNum,
-    } = useUserMaps(maps);
+    } = useUserMaps(maps, store.state.globalMapsOrder);
 
     onBeforeMount(nextPage);
 
     onBeforeRouteLeave(() => {
       if (isDownloading.value) return false;
     });
+
+    const orders: Orders = {
+      new: {
+        field: "created_at",
+        dir: "desc",
+      },
+      top: {
+        field: "downloads",
+        dir: "desc",
+      },
+    };
+    const selectedOrder = ref<keyof typeof orders>(
+      store.state.globalMapsOrderName || "new"
+    );
+
+    const changeOrder = (o: keyof typeof orders) => {
+      selectedOrder.value = o;
+      store.commit("SET_GLOBAL_MAPS_ORDER", { order: orders[o], name: o });
+
+      order.value = orderBy(orders[o].field, orders[o].dir);
+    };
 
     return {
       pageNum,
@@ -112,6 +152,9 @@ export default defineComponent({
       downloadMap,
       searchTerm,
       search,
+      selectedOrder,
+      orders,
+      changeOrder,
     };
   },
 });
