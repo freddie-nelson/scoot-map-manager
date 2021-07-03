@@ -28,6 +28,20 @@
       "
     ></div>
 
+    <p
+      v-if="map.downloads !== undefined"
+      class="
+        downloads-count
+        absolute
+        top-2
+        right-2.5
+        font-medium
+        text-xs text-t-main
+      "
+    >
+      downloads: {{ map.downloads }}
+    </p>
+
     <div
       class="
         bg-transparent
@@ -47,7 +61,7 @@
         <p class="text-xs opacity-60">{{ map.creator || "Creator" }}</p>
       </div>
 
-      <div class="mr-3.5 flex">
+      <div class="mr-1 flex">
         <button
           v-if="buttonIcon2"
           class="
@@ -114,4 +128,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.downloads-count {
+  --blur: 22px;
+  text-shadow: 0px 0px var(--blur) #000000, 0px 0px var(--blur) #000000,
+    0px 0px var(--blur) #000000, 0px 0px var(--blur) #000000,
+    0px 0px var(--blur) #000000, 0px 0px var(--blur) #000000;
+}
 </style>
