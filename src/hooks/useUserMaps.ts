@@ -104,8 +104,9 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
     addDocsToMaps(docs.docs);
   };
 
+  let disablePageChange = false;
   const nextPage = async () => {
-    if (maps.value.length === 0 && pageNum.value !== 0) return;
+    if ((maps.value.length === 0 && pageNum.value !== 0) || disablePageChange) return;
 
     pageNum.value++;
     isLoading.value = true;
@@ -116,7 +117,7 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
   };
 
   const previousPage = async () => {
-    if (pageNum.value === 1) return;
+    if (pageNum.value === 1 || disablePageChange) return;
 
     pageNum.value--;
     isLoading.value = true;
@@ -221,16 +222,24 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
     }
 
     // early exits
-    if (searchTerm === "" && recentSearchCount < 5) {
-      pageNum.value = 0;
-      maps.value.length = 0;
-      lastVisible.value = undefined;
-      firstVisible.value = undefined;
+    if (searchTerm === "") {
+      if (recentSearchCount < 5) {
+        disablePageChange = false;
+        pageNum.value = 0;
+        maps.value.length = 0;
+        lastVisible.value = undefined;
+        firstVisible.value = undefined;
 
-      lastSearchTime = Date.now();
+        lastSearchTime = Date.now();
 
-      return nextPage();
+        nextPage();
+      }
+
+      return;
     } else if (searchTerm === lastSearchTerm) return;
+
+    disablePageChange = true;
+    pageNum.value = 1;
 
     let q: Query;
     if (searchTerm.startsWith("creatorId:")) {
@@ -239,7 +248,8 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
       q = query(
         mapsRef,
         where("name", ">=", searchTerm),
-        where("name", "<=", searchTerm + "\uf8ff") // uf8ff is super high value unicode char so everything that starts with searchTerm is found
+        where("name", "<=", searchTerm + "\uf8ff"), // uf8ff is super high value unicode char so everything that starts with searchTerm is found
+        limit(10)
       );
     }
 
@@ -247,7 +257,6 @@ export default function (maps: Ref<Map[]>, startPage = 0, mapsPerPage = 25) {
 
     const docs = await getDocs(q);
 
-    setDocBoundaries(docs.docs);
     addDocsToMaps(docs.docs);
 
     lastSearchTerm = searchTerm;
