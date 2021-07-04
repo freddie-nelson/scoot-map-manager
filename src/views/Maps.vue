@@ -81,7 +81,6 @@ import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 import SModal from "@/components/shared/Modal/SModal.vue";
 import { Map, useStore } from "@/store";
 import SInputDropdown from "@/components/shared/Input/SInputDropdown.vue";
-import { orderBy } from "@firebase/firestore";
 
 interface Orders {
   [key: string]: Order;
@@ -135,11 +134,16 @@ export default defineComponent({
       store.state.globalMapsOrderName || "new"
     );
 
+    let lastChangedOrder = 0;
+
     const changeOrder = (o: keyof typeof orders) => {
+      if (Date.now() - lastChangedOrder < 20 * 1000) return; // TODO implement toast warning
+
       selectedOrder.value = o;
       store.commit("SET_GLOBAL_MAPS_ORDER", { order: orders[o], name: o });
 
-      order.value = orderBy(orders[o].field, orders[o].dir);
+      order.value = orders[o];
+      lastChangedOrder = Date.now();
     };
 
     return {

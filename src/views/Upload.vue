@@ -5,9 +5,9 @@
     </s-gradient-heading>
 
     <form
-      v-if="!isUploading"
+      v-if="!isUploading && !showSuccessMsg"
       class="flex flex-col max-w-xl w-full px-4 mt-8"
-      @submit.prevent="uploadMap(map)"
+      @submit.prevent="upload"
     >
       <s-input-text
         v-model="map.name"
@@ -25,7 +25,34 @@
       <s-button class="mt-5" type="submit">Upload</s-button>
     </form>
 
-    <s-spinner-bar v-else class="h-5 max-w-xl w-full px-4 mt-8" />
+    <s-spinner-bar
+      v-else-if="!showSuccessMsg"
+      class="h-5 max-w-xl w-full px-4 mt-8"
+    />
+
+    <div v-else-if="showSuccessMsg" class="text-center">
+      <p class="font-semibold text-2xl max-w-4xl px-3 my-6">
+        Your map was successfully uploaded, however it may take up to 10 minutes
+        for it to be published to
+        <router-link
+          class="
+            text-accent-400
+            underline
+            hover:text-primary-500
+            transition-colors
+            duration-300
+          "
+          to="/maps"
+        >
+          Global Maps
+        </router-link>
+        .
+      </p>
+
+      <s-button @click.once="$router.push({ name: 'Installed' })">
+        Back to Maps
+      </s-button>
+    </div>
   </main>
 </template>
 
@@ -77,12 +104,27 @@ export default defineComponent({
     const { isNameTaken, uploadFailed, isUploading, uploadMap } =
       useUploadMap(map);
 
+    const showSuccessMsg = ref(false);
+
+    const upload = async () => {
+      if (!map.value || !map.value.name) return;
+
+      map.value.name = map.value.name.trim();
+
+      const res = await uploadMap(map.value);
+      if (!res) return;
+
+      showSuccessMsg.value = true;
+      store.commit("SET_REFRESH_UPLOADED", true);
+    };
+
     return {
       map,
       isNameTaken,
       uploadFailed,
       isUploading,
-      uploadMap,
+      upload,
+      showSuccessMsg,
     };
   },
 });

@@ -1,5 +1,5 @@
 import { Ref, ref, watch } from "vue";
-import store, { Map } from "@/store";
+import store, { Map, QueryInfo } from "@/store";
 import {
   getFirestore,
   collection,
@@ -20,6 +20,8 @@ import {
   where,
   deleteDoc,
   OrderByDirection,
+  queryEqual,
+  getDocsFromCache,
 } from "firebase/firestore";
 import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 import { createDir, writeBinaryFile } from "@tauri-apps/api/fs";
@@ -35,7 +37,7 @@ const defaultOrder: Order = {
   dir: "desc",
 };
 
-export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage = 0, mapsPerPage = 25) {
+export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage = 0, mapsPerPage = 20) {
   const storage = getStorage();
 
   const db = getFirestore();
@@ -45,9 +47,12 @@ export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage 
   const perPage = ref(mapsPerPage);
 
   const isLoading = ref(false);
-  const order = ref(orderBy(startOrder.field, startOrder.dir));
+  const order = ref(startOrder);
+  let orderConstraint = orderBy(startOrder.field, startOrder.dir);
 
   const resetMaps = () => {
+    orderConstraint = orderBy(order.value.field, order.value.dir);
+
     disablePageChange = false;
     pageNum.value = 0;
     maps.value.length = 0;
@@ -88,21 +93,68 @@ export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage 
     lastVisible.value = docs[docs.length - 1];
   };
 
-  const fetchNextMaps = async () => {
-    let q: Query<DocumentData>;
-    if (!lastVisible.value) {
-      q = query(mapsRef, order.value, limit(perPage.value));
-    } else {
-      q = query(mapsRef, order.value, startAfter(lastVisible.value), limit(perPage.value));
-    }
+  /** @returns true if the queries have the same constraints */
+  const compareQueries = (c: QueryInfo, l: QueryInfo): boolean => {
+    if (c.time - l.time > 5 * 60 * 1000) return false;
+
+    return !(
+      c.order.dir !== l.order.dir ||
+      c.order.field !== l.order.field ||
+      c.limit !== l.limit ||
+      (c.first && l.first && c.first !== l.first) ||
+      (c.last && l.last && c.last !== l.last)
+    );
+  };
+
+  const fetchDocs = async (q: Query<DocumentData>) => {
+    const query: QueryInfo = {
+      order: order.value,
+      limit: perPage.value,
+      last: lastVisible.value,
+      first: firstVisible.value,
+      time: Date.now(),
+    };
 
     let docs: QuerySnapshot<DocumentData>;
     try {
-      docs = await getDocs(q);
+      if (store.state.lastQuery && compareQueries(query, store.state.lastQuery)) {
+        docs = await getDocsFromCache(q);
+
+        if (docs.empty) {
+          console.log("cache empty");
+          docs = await getDocs(q);
+        }
+      } else {
+        console.log("no cache hit");
+        docs = await getDocs(q);
+      }
+
+      store.commit("SET_LAST_QUERY", {
+        order: order.value,
+        limit: perPage.value,
+        last: lastVisible.value,
+        first: firstVisible.value,
+        time: Date.now(),
+      });
+      console.log(`from cache: ${docs.metadata.fromCache}`);
     } catch (error) {
       console.log(error);
       return;
     }
+
+    return docs;
+  };
+
+  const fetchNextMaps = async () => {
+    let q: Query<DocumentData>;
+    if (!lastVisible.value) {
+      q = query(mapsRef, orderConstraint, limit(perPage.value));
+    } else {
+      q = query(mapsRef, orderConstraint, startAfter(lastVisible.value), limit(perPage.value));
+    }
+
+    const docs = await fetchDocs(q);
+    if (!docs) return;
 
     setDocBoundaries(docs.docs);
     addDocsToMaps(docs.docs);
@@ -111,18 +163,13 @@ export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage 
   const fetchPreviousMaps = async () => {
     let q: Query<DocumentData>;
     if (maps.value.length === 0) {
-      q = query(mapsRef, order.value, endAt(lastVisible.value), limit(perPage.value));
+      q = query(mapsRef, orderConstraint, endAt(lastVisible.value), limit(perPage.value));
     } else {
-      q = query(mapsRef, order.value, endBefore(firstVisible.value), limit(perPage.value));
+      q = query(mapsRef, orderConstraint, endBefore(firstVisible.value), limit(perPage.value));
     }
 
-    let docs: QuerySnapshot<DocumentData>;
-    try {
-      docs = await getDocs(q);
-    } catch (error) {
-      console.log(error);
-      return;
-    }
+    const docs = await fetchDocs(q);
+    if (!docs) return;
 
     setDocBoundaries(docs.docs);
     addDocsToMaps(docs.docs);
@@ -130,7 +177,11 @@ export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage 
 
   let disablePageChange = false;
   const nextPage = async () => {
-    if ((maps.value.length === 0 && pageNum.value !== 0) || disablePageChange) return;
+    if (
+      ((maps.value.length === 0 || maps.value.length < perPage.value) && pageNum.value !== 0) ||
+      disablePageChange
+    )
+      return;
 
     pageNum.value++;
     isLoading.value = true;

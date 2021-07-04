@@ -29,7 +29,10 @@
         >
           Locate Folder
         </s-button>
-        <s-button @click="loadMaps(true)" class="ml-5 transform scale-90">
+        <s-button
+          @click="executeLoadMaps = !executeLoadMaps"
+          class="ml-5 transform scale-90"
+        >
           Refresh Maps
         </s-button>
       </div>
@@ -42,12 +45,15 @@
       <s-spinner-bar class="h-5 mt-10 w-full max-w-2xl px-8 mx-auto" />
     </div>
 
-    <router-view v-show="!$store.state.isLoadingInstalled" />
+    <router-view
+      :executeLoadMaps="executeLoadMaps"
+      v-show="!$store.state.isLoadingInstalled"
+    />
   </main>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
@@ -59,6 +65,13 @@ export default defineComponent({
     SGradientHeading,
     SButton,
     SSpinnerBar,
+  },
+  setup() {
+    const executeLoadMaps = ref(false);
+
+    return {
+      executeLoadMaps,
+    };
   },
 });
 </script>

@@ -13,6 +13,22 @@
       You haven't uploaded any maps yet.
     </h1>
 
+    <s-modal v-if="mapToDelete" class="max-w-4xl w-full">
+      <s-gradient-heading :size="4"
+        >Deleting {{ mapToDelete }}...</s-gradient-heading
+      >
+
+      <s-spinner-bar v-if="!showDeleteFailMsg" class="w-full h-5 mt-4" />
+
+      <div v-else class="text-center">
+        <p class="mb-6 mt-3 font-semibold text-2xl">
+          An error occurred while deleting the map.
+        </p>
+
+        <s-button @click="mapToDelete = ''">Close</s-button>
+      </div>
+    </s-modal>
+
     <s-modal
       v-if="mapToUpdate"
       closeable
@@ -68,7 +84,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { Map, useStore } from "@/store";
 import useUserMaps from "@/hooks/useUserMaps";
@@ -78,6 +94,7 @@ import SMapList from "@/components/app/Map/SMapList.vue";
 import SModal from "@/components/shared/Modal/SModal.vue";
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
 import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
+import SButton from "@/components/shared/Button/SButton.vue";
 
 import trashIcon from "@iconify-icons/feather/trash";
 import uploadIcon from "@iconify-icons/feather/upload";
@@ -96,28 +113,48 @@ export default defineComponent({
     SModal,
     SGradientHeading,
     SSpinnerBar,
+    SButton,
   },
   setup() {
     const store = useStore();
 
-    const maps = ref<Map[]>([]);
+    const maps = ref<Map[]>([...store.state.uploadedMaps]);
+    watch(maps, () => {
+      store.commit("SET_UPLOADED_MAPS", maps.value);
+    });
+
     const { search, deleteMap: deleteMapDB } = useUserMaps(maps);
 
     const loadMaps = async () => {
-      if (store.state.isLoadingInstalled || !store.state.user) return;
+      if (
+        store.state.isLoadingInstalled ||
+        !store.state.user ||
+        !store.state.refreshUploaded
+      )
+        return;
 
       store.commit("SET_LOADING_INSTALLED", true);
 
       await search(`creatorId:${store.state.user.uid}`);
 
       store.commit("SET_LOADING_INSTALLED", false);
+      store.commit("SET_REFRESH_UPLOADED", false);
     };
 
-    const deleteMap = (i: number) => {
+    const mapToDelete = ref("");
+    const showDeleteFailMsg = ref(false);
+
+    const deleteMap = async (i: number) => {
       if (i < 0 || i >= maps.value.length) return;
 
-      deleteMapDB(maps.value[i]);
+      mapToDelete.value = maps.value[i].name;
+
+      const success = await deleteMapDB(maps.value[i]);
+      if (!success) return (showDeleteFailMsg.value = true);
+
       maps.value.splice(i, 1);
+      mapToDelete.value = "";
+      store.commit("SET_REFRESH_UPLOADED", true);
     };
 
     onMounted(loadMaps);
@@ -177,12 +214,18 @@ export default defineComponent({
 
       isUploading.value = false;
       showSuccessMsg.value = true;
+      store.commit("SET_REFRESH_UPLOADED", true);
+      loadMaps();
     };
 
     return {
       maps,
       loadMaps,
+
+      mapToDelete,
+      showDeleteFailMsg,
       deleteMap,
+
       isUploading,
       mapToUpdate,
       updateMap,

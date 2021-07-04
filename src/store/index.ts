@@ -1,4 +1,5 @@
 import { Order } from "@/hooks/useUserMaps";
+import { DocumentData, Query } from "@firebase/firestore";
 import { User } from "firebase/auth";
 import pathParse from "path-parse";
 import { createStore, useStore as vuexUseStore } from "vuex";
@@ -19,6 +20,14 @@ export interface Map {
 
 export type ParsedPath = ReturnType<typeof pathParse>;
 
+export interface QueryInfo {
+  [index: string]: any;
+  order: Order;
+  limit: number;
+  time: number;
+  last?: DocumentData;
+  first?: DocumentData;
+}
 export interface State {
   toastQueue: Toast[];
   user?: User;
@@ -29,6 +38,9 @@ export interface State {
   lastLoadedMaps: number;
   globalMapsOrder?: Order;
   globalMapsOrderName?: string;
+  lastQuery?: QueryInfo;
+  uploadedMaps: Map[];
+  refreshUploaded: boolean;
 }
 
 const gameDirStr = window.localStorage.getItem("gameDir");
@@ -42,6 +54,8 @@ const store = createStore<State>({
     installedMaps: [],
     isLoadingInstalled: false,
     lastLoadedMaps: 0,
+    uploadedMaps: [],
+    refreshUploaded: true,
   },
   mutations: {
     REMOVE_TOAST(state: any) {
@@ -69,7 +83,7 @@ const store = createStore<State>({
       state.installedMaps.push(map);
     },
     ADD_MAP_IMAGE(state, { i, url }: { i: number; url: string }) {
-      state.installedMaps[i].image = url;
+      if (state.installedMaps[i]) state.installedMaps[i].image = url;
     },
     REMOVE_INSTALLED_MAP(state, index: number) {
       state.installedMaps.splice(index, 1);
@@ -85,6 +99,17 @@ const store = createStore<State>({
     SET_GLOBAL_MAPS_ORDER(state, { order, name }: { order: Order; name: string }) {
       state.globalMapsOrder = order;
       state.globalMapsOrderName = name;
+    },
+
+    SET_LAST_QUERY(state, query: QueryInfo) {
+      state.lastQuery = query;
+    },
+
+    SET_UPLOADED_MAPS(state, maps: Map[]) {
+      state.uploadedMaps = maps;
+    },
+    SET_REFRESH_UPLOADED(state, b: boolean) {
+      state.refreshUploaded = b;
     },
   },
   actions: {},

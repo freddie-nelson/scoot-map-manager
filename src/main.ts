@@ -7,6 +7,7 @@ import "./assets/tailwind.css";
 // setup firebase
 import { initializeApp } from "firebase/app";
 import { browserLocalPersistence, getAuth } from "firebase/auth";
+import { enableIndexedDbPersistence, getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA5Byw4nqMC4U0Q9TY3c1W09wsJzXhIKP8",
@@ -20,14 +21,21 @@ const firebaseConfig = {
 
 initializeApp(firebaseConfig);
 
+const db = getFirestore();
+enableIndexedDbPersistence(db)
+  .then(() => console.log("enabled indexed db persistence"))
+  .catch((e) => console.log(e));
+
 const auth = getAuth();
 auth.setPersistence(browserLocalPersistence);
 
 auth.onAuthStateChanged(() => {
   store.commit("SET_USER", auth.currentUser || undefined);
 
-  if (auth.currentUser) router.push({ name: "Profile" });
-  else router.push({ name: "Login" });
+  if (auth.currentUser) {
+    if (router.currentRoute.value.name?.toString().match(/(Login)|(Register)/))
+      router.push({ name: "Profile" });
+  } else router.push({ name: "Login" });
 });
 
 const app = createApp(App);

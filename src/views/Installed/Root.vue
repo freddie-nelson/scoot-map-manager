@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onMounted, watch } from "vue";
 import { useStore } from "@/store";
 import useInstalledMaps from "@/hooks/useInstalledMaps";
 
@@ -42,7 +42,13 @@ export default defineComponent({
   components: {
     SMapList,
   },
-  setup() {
+  props: {
+    executeLoadMaps: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
     const store = useStore();
     const { readAndParseMaps, deleteMap, uploadMap } = useInstalledMaps();
 
@@ -57,6 +63,13 @@ export default defineComponent({
     };
 
     onMounted(loadMaps);
+
+    watch(
+      computed(() => props.executeLoadMaps),
+      () => {
+        loadMaps(true);
+      }
+    );
 
     return {
       loadMaps,

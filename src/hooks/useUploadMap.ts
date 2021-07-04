@@ -1,7 +1,6 @@
 import { computed, Ref, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import store, { Map } from "@/store";
-import router from "@/router";
 
 import {
   deleteDoc,
@@ -166,6 +165,7 @@ export default function (map: Ref<Map | undefined>) {
 
   const uploadMap = async (map: Map) => {
     uploadFailed.value = false;
+
     if (!map || !store.state.user || !(await isNameValid(map.name))) return;
     isUploading.value = true;
 
@@ -188,7 +188,7 @@ export default function (map: Ref<Map | undefined>) {
     if (!success) return;
 
     isUploading.value = false;
-    router.push({ name: "Installed" });
+    return true;
   };
 
   const cleanupUploadFail = async (
