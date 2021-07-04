@@ -59,18 +59,14 @@
     </div>
 
     <!-- download modal -->
-    <s-modal v-if="isDownloading" class="max-w-2xl w-full">
-      <s-gradient-heading class="mb-5" :size="4" noScale>
-        Downloading Map...
-      </s-gradient-heading>
-      <s-spinner-bar class="h-4 w-full" />
-    </s-modal>
+    <s-modals-download v-if="isDownloading" />
   </main>
 </template>
 
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
+import { Map, useStore } from "@/store";
 import useUserMaps, { Order } from "@/hooks/useUserMaps";
 
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
@@ -78,9 +74,8 @@ import SInputText from "@/components/shared/Input/SInputText.vue";
 import SMapList from "@/components/app/Map/SMapList.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
 import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
-import SModal from "@/components/shared/Modal/SModal.vue";
-import { Map, useStore } from "@/store";
 import SInputDropdown from "@/components/shared/Input/SInputDropdown.vue";
+import SModalsDownload from "@/components/app/Modals/SModalsDownload.vue";
 
 interface Orders {
   [key: string]: Order;
@@ -94,8 +89,8 @@ export default defineComponent({
     SMapList,
     SButton,
     SSpinnerBar,
-    SModal,
     SInputDropdown,
+    SModalsDownload,
   },
   setup() {
     const store = useStore();

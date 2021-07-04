@@ -1,8 +1,14 @@
 <template>
-  <s-dashboard-card>
+  <s-dashboard-card class="flex flex-col">
     <s-home-dash-title>Featured Maps</s-home-dash-title>
 
-    <s-map-list class="mt-3" :maps="maps" />
+    <s-map-list
+      class="map-list mt-3"
+      :maps="maps"
+      @map-clicked="downloadMap(maps[$event])"
+    />
+
+    <s-modals-download v-if="isDownloading" />
   </s-dashboard-card>
 </template>
 
@@ -25,6 +31,8 @@ import {
 import SDashboardCard from "@/components/app/Dashboard/SDashboardCard.vue";
 import SHomeDashTitle from "./SHomeDashTitle.vue";
 import SMapList from "@/components/app/Map/SMapList.vue";
+import SModalsDownload from "@/components/app/Modals/SModalsDownload.vue";
+import { onBeforeRouteLeave } from "vue-router";
 
 export default defineComponent({
   name: "SHomeDashFeatured",
@@ -32,6 +40,7 @@ export default defineComponent({
     SDashboardCard,
     SHomeDashTitle,
     SMapList,
+    SModalsDownload,
   },
   setup() {
     const db = getFirestore();
@@ -59,8 +68,6 @@ export default defineComponent({
         return;
       }
 
-      console.log(mapNames);
-
       const arr: (Map | false)[] = await Promise.all(
         mapNames.map(async (n) => {
           const docRef = doc(db, "maps", n);
@@ -70,6 +77,8 @@ export default defineComponent({
             let res = await getDocFromCache(docRef);
             if (!res.exists()) {
               res = await getDoc(docRef);
+            } else {
+              console.log("featured map in cache");
             }
 
             d = await res.data();
@@ -98,6 +107,10 @@ export default defineComponent({
 
     onMounted(fetchFeaturedMaps);
 
+    onBeforeRouteLeave(() => {
+      if (isDownloading.value) return false;
+    });
+
     return {
       maps,
       isLoading,
@@ -109,5 +122,18 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.map-list {
+  flex-grow: 1;
+
+  > * {
+    height: 100%;
+  }
+
+  @media screen and (max-width: 1596px) {
+    > * {
+      height: 18rem;
+    }
+  }
+}
 </style>

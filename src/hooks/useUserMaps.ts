@@ -269,6 +269,8 @@ export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage 
 
   const isDownloading = ref(false);
   const downloadMap = async (map: Map) => {
+    if (isDownloading.value) return;
+
     isDownloading.value = true;
 
     await fetchAndSaveMap(map);
