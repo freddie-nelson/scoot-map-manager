@@ -26,7 +26,7 @@
         </s-gradient-heading>
 
         <p v-if="!showSuccessMsg" class="mt-3 font-semibold text-xl">
-          Select the new map files.
+          Select the new map files. (name will not change)
         </p>
         <p v-else class="mt-3 font-semibold text-xl">
           Your map was successfully updated, however you will have to restart
