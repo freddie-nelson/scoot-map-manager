@@ -54,6 +54,9 @@
       },
       "dialog": {
         "open": true
+      },
+      "window": {
+        "all": true
       }
     },
     "windows": [

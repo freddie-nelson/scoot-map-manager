@@ -1,17 +1,20 @@
 <template>
-  <s-sidebar />
+  <s-nav-titlebar />
+  <s-nav-sidebar />
   <router-view
     class="w-full h-full p-14 -ml-24 bg-bg-dark text-t-main relative"
   />
 </template>
 
 <script>
-import SSidebar from "@/components/app/Nav/SSidebar.vue";
+import SNavSidebar from "@/components/app/Nav/SNavSidebar.vue";
+import SNavTitlebar from "./components/app/Nav/SNavTitlebar.vue";
 
 export default {
   name: "App",
   components: {
-    SSidebar,
+    SNavSidebar,
+    SNavTitlebar,
   },
 };
 </script>

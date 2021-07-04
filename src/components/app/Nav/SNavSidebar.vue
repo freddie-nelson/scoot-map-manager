@@ -53,7 +53,7 @@ import mapIcon from "@iconify-icons/feather/map";
 import userIcon from "@iconify-icons/feather/user";
 
 export default defineComponent({
-  name: "SSidebar",
+  name: "SNavSidebar",
   components: {
     Icon,
   },
