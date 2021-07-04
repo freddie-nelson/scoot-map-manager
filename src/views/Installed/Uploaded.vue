@@ -82,6 +82,12 @@ import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 import trashIcon from "@iconify-icons/feather/trash";
 import uploadIcon from "@iconify-icons/feather/upload";
 import folderPlusIcon from "@iconify-icons/feather/folder-plus";
+import {
+  doc,
+  getFirestore,
+  serverTimestamp,
+  updateDoc,
+} from "@firebase/firestore";
 
 export default defineComponent({
   name: "Uploaded",
@@ -156,6 +162,18 @@ export default defineComponent({
         parkFile
       );
       if (!uploadRes) return;
+
+      try {
+        await updateDoc(doc(getFirestore(), "maps", mapToUpdate.value.name), {
+          creator:
+            store.state.user.displayName ||
+            store.state.user.email?.split("@")[0] ||
+            "Joe",
+          created_at: serverTimestamp(),
+        });
+      } catch (error) {
+        console.log(error);
+      }
 
       isUploading.value = false;
       showSuccessMsg.value = true;
