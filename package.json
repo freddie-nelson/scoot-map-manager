@@ -10,6 +10,8 @@
     "tauri:serve": "vue-cli-service tauri:serve"
   },
   "dependencies": {
+    "@fontsource/poppins": "^4.4.5",
+    "@fontsource/roboto-mono": "^4.4.5",
     "@iconify-icons/feather": "^1.1.0",
     "@tailwindcss/postcss7-compat": "^2.0.2",
     "autoprefixer": "^9",
