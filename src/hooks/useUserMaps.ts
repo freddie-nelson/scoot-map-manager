@@ -359,6 +359,7 @@ export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage 
     isLoading,
     nextPage,
     previousPage,
+    addDocsToMaps,
 
     isDownloading,
     downloadMap,

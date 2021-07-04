@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, watch } from "vue";
+import { computed, defineComponent, onBeforeMount, watch } from "vue";
 import { useStore } from "@/store";
 import useInstalledMaps from "@/hooks/useInstalledMaps";
 
@@ -62,7 +62,7 @@ export default defineComponent({
       store.commit("SET_LOADING_INSTALLED", false);
     };
 
-    onMounted(loadMaps);
+    onBeforeMount(loadMaps);
 
     watch(
       computed(() => props.executeLoadMaps),

@@ -17,7 +17,7 @@
             v-model="searchTerm"
             name="search"
             placeholder="Search..."
-            @keyup.enter="search"
+            @keyup.enter="search(searchTerm)"
           />
           <s-button class="ml-2.5 py-3 h-full" @click="search(searchTerm)"
             >Search</s-button
