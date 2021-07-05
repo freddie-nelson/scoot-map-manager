@@ -4,7 +4,7 @@
       v-if="maps.length > 0"
       :maps="maps"
       :buttonIcon="icons.trash"
-      @map-clicked="deleteMap"
+      @map-clicked="mapToDelete = maps[$event]"
       :buttonIcon2="icons.upload"
       @map-clicked-2="mapToUpdate = maps[$event]"
     />
@@ -13,21 +13,14 @@
       You haven't uploaded any maps yet.
     </h1>
 
-    <s-modal v-if="mapToDelete" class="max-w-4xl w-full">
-      <s-gradient-heading :size="4"
-        >Deleting {{ mapToDelete }}...</s-gradient-heading
-      >
-
-      <s-spinner-bar v-if="!showDeleteFailMsg" class="w-full h-5 mt-4" />
-
-      <div v-else class="text-center">
-        <p class="mb-6 mt-3 font-semibold text-2xl">
-          An error occurred while deleting the map.
-        </p>
-
-        <s-button @click="mapToDelete = ''">Close</s-button>
-      </div>
-    </s-modal>
+    <s-modals-delete
+      v-if="mapToDelete"
+      :isDeleting="isDeleting"
+      :isFail="showDeleteFail"
+      :map="mapToDelete"
+      @close="mapToDelete = undefined"
+      @delete="deleteMap"
+    />
 
     <s-modal
       v-if="mapToUpdate"
@@ -94,7 +87,7 @@ import SMapList from "@/components/app/Map/SMapList.vue";
 import SModal from "@/components/shared/Modal/SModal.vue";
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
 import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
-import SButton from "@/components/shared/Button/SButton.vue";
+import SModalsDelete from "@/components/app/Modals/SModalsDelete.vue";
 
 import trashIcon from "@iconify-icons/feather/trash";
 import uploadIcon from "@iconify-icons/feather/upload";
@@ -113,7 +106,7 @@ export default defineComponent({
     SModal,
     SGradientHeading,
     SSpinnerBar,
-    SButton,
+    SModalsDelete,
   },
   setup() {
     const store = useStore();
@@ -141,19 +134,30 @@ export default defineComponent({
       store.commit("SET_REFRESH_UPLOADED", false);
     };
 
-    const mapToDelete = ref("");
-    const showDeleteFailMsg = ref(false);
+    const mapToDelete = ref<Map>();
+    const isDeleting = ref(false);
+    const showDeleteFail = ref(false);
 
-    const deleteMap = async (i: number) => {
-      if (i < 0 || i >= maps.value.length) return;
+    const deleteMap = async () => {
+      if (!mapToDelete.value) return;
 
-      mapToDelete.value = maps.value[i].name;
+      isDeleting.value = true;
 
-      const success = await deleteMapDB(maps.value[i]);
-      if (!success) return (showDeleteFailMsg.value = true);
+      const success = await deleteMapDB(mapToDelete.value);
+      if (!success) {
+        showDeleteFail.value = true;
+        isDeleting.value = false;
+        return;
+      }
 
-      maps.value.splice(i, 1);
-      mapToDelete.value = "";
+      maps.value.splice(
+        maps.value.findIndex((m) => m === mapToDelete.value),
+        1
+      );
+
+      mapToDelete.value = undefined;
+      isDeleting.value = false;
+
       store.commit("SET_REFRESH_UPLOADED", true);
     };
 
@@ -223,7 +227,8 @@ export default defineComponent({
       loadMaps,
 
       mapToDelete,
-      showDeleteFailMsg,
+      showDeleteFail,
+      isDeleting,
       deleteMap,
 
       isUploading,

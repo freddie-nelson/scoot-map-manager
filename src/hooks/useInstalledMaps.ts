@@ -1,4 +1,4 @@
-import { useStore } from "@/store";
+import { Map, useStore } from "@/store";
 import { useRouter } from "vue-router";
 import { FileEntry, readDir, removeDir, readBinaryFile } from "@tauri-apps/api/fs";
 import { getLastModified } from "@/plugins/Metadata";
@@ -86,17 +86,19 @@ export default function () {
     store.commit("ADD_MAP_IMAGE", { i, url: URL.createObjectURL(blob) });
   };
 
-  const deleteMap = async (i: number) => {
-    const map = store.state.installedMaps[i];
+  const deleteMap = async (map: Map) => {
     const path = pathParse(map.parkFile);
-
-    store.commit("REMOVE_INSTALLED_MAP", i);
+    const i = store.state.installedMaps.findIndex((m) => m === map);
 
     try {
       await removeDir(path.dir, { recursive: true });
+      store.commit("REMOVE_INSTALLED_MAP", i);
     } catch (error) {
-      return;
+      console.log(error);
+      return false;
     }
+
+    return true;
   };
 
   const uploadMap = (i: number) => {

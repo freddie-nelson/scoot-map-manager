@@ -5,7 +5,7 @@
       :maps="$store.state.installedMaps"
       :buttonIcon="icons.trash"
       :buttonIcon2="icons.upload"
-      @map-clicked="deleteMap"
+      @map-clicked="mapToDelete = $store.state.installedMaps[$event]"
       @map-clicked-2="uploadMap"
     />
 
@@ -24,15 +24,25 @@
         >Download some made by other users!</router-link
       >
     </h1>
+
+    <s-modals-delete
+      v-if="mapToDelete"
+      :isDeleting="isDeleting"
+      :isFail="showDeleteFail"
+      :map="mapToDelete"
+      @close="mapToDelete = undefined"
+      @delete="deleteMap"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, watch } from "vue";
-import { useStore } from "@/store";
+import { computed, defineComponent, onBeforeMount, watch, ref } from "vue";
+import { Map, useStore } from "@/store";
 import useInstalledMaps from "@/hooks/useInstalledMaps";
 
 import SMapList from "@/components/app/Map/SMapList.vue";
+import SModalsDelete from "@/components/app/Modals/SModalsDelete.vue";
 
 import trashIcon from "@iconify-icons/feather/trash";
 import uploadIcon from "@iconify-icons/feather/upload";
@@ -41,6 +51,7 @@ export default defineComponent({
   name: "name",
   components: {
     SMapList,
+    SModalsDelete,
   },
   props: {
     executeLoadMaps: {
@@ -50,7 +61,11 @@ export default defineComponent({
   },
   setup(props) {
     const store = useStore();
-    const { readAndParseMaps, deleteMap, uploadMap } = useInstalledMaps();
+    const {
+      readAndParseMaps,
+      deleteMap: deleteMapFS,
+      uploadMap,
+    } = useInstalledMaps();
 
     const loadMaps = async (force = false) => {
       if (store.state.isLoadingInstalled) return;
@@ -71,10 +86,35 @@ export default defineComponent({
       }
     );
 
+    const mapToDelete = ref<Map>();
+    const isDeleting = ref(false);
+    const showDeleteFail = ref(false);
+
+    const deleteMap = async () => {
+      if (!mapToDelete.value) return;
+
+      isDeleting.value = true;
+
+      const success = await deleteMapFS(mapToDelete.value);
+      if (!success) {
+        showDeleteFail.value = true;
+        isDeleting.value = false;
+        return;
+      }
+
+      mapToDelete.value = undefined;
+      isDeleting.value = false;
+    };
+
     return {
       loadMaps,
-      deleteMap,
       uploadMap,
+
+      mapToDelete,
+      isDeleting,
+      showDeleteFail,
+      deleteMap,
+
       icons: {
         trash: trashIcon,
         upload: uploadIcon,
