@@ -45,7 +45,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 section {
   display: grid;
-  grid-gap: 1.4rem;
+  gap: 1.4rem;
   grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
 }
 </style>

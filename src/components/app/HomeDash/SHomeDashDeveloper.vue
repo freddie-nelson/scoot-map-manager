@@ -2,10 +2,18 @@
   <s-dashboard-card class="flex flex-col">
     <s-home-dash-title>Support Development</s-home-dash-title>
 
-    <p class="font-medium mt-4 opacity-70">
-      Hey SCOOT fan! I'm Freddie, the developer of SCOOT map manager. Server
-      costs aren't free, so if you love SMM I would greatly appreciate it if you
-      could help keep it alive. Thanks! &lt;3
+    <p class="font-medium mt-4 mb-5 opacity-70">
+      Hey
+      {{
+        $store.state.user && $store.state.user.email
+          ? `${
+              $store.state.user.displayName ||
+              $store.state.user.email.split("@")[0]
+            }`
+          : "SCOOT fan"
+      }}! I'm Freddie, the developer of SCOOT map manager. Server costs aren't
+      free, so if you love SMM I would greatly appreciate it if you could help
+      keep it alive. Thanks! &lt;3
     </p>
 
     <s-button @click="openDonateLink" class="w-full mt-auto">Donate</s-button>

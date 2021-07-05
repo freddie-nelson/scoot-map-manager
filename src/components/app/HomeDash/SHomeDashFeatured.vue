@@ -8,11 +8,15 @@
     </div>
 
     <s-map-list
-      v-else
+      v-else-if="maps.length > 0"
       class="map-list mt-3"
       :maps="maps"
       @map-clicked="downloadMap(maps[$event])"
     />
+
+    <h1 v-else class="m-auto text-center text-3xl font-semibold opacity-60">
+      No featured maps right now, check back later.
+    </h1>
 
     <s-modals-download v-if="isDownloading" />
   </s-dashboard-card>
@@ -135,15 +139,10 @@ export default defineComponent({
 <style lang="scss">
 .map-list {
   flex-grow: 1;
+  grid-template-columns: repeat(auto-fit, minmax(32rem, 1fr)) !important;
 
   > * {
     height: 100% !important;
-  }
-
-  @media screen and (max-width: 1596px) {
-    > * {
-      height: 18rem !important;
-    }
   }
 }
 </style>

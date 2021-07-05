@@ -16,8 +16,8 @@
     <div class="flex-grow">
       <s-dashboard class="dashboard">
         <s-home-dash-featured style="grid-area: fm" />
-        <s-home-dash-stats style="grid-area: s" />
-        <s-home-dash-patch style="grid-area: pn" />
+        <s-home-dash-news style="grid-area: n" />
+        <!-- <s-home-dash-patch style="grid-area: pn" /> -->
         <s-home-dash-developer style="grid-area: d" />
       </s-dashboard>
     </div>
@@ -30,8 +30,8 @@ import { defineComponent } from "vue";
 import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
 import SDashboard from "@/components/app/Dashboard/SDashboard.vue";
 import SHomeDashFeatured from "@/components/app/HomeDash/SHomeDashFeatured.vue";
-import SHomeDashPatch from "@/components/app/HomeDash/SHomeDashPatch.vue";
-import SHomeDashStats from "@/components/app/HomeDash/SHomeDashStats.vue";
+// import SHomeDashPatch from "@/components/app/HomeDash/SHomeDashPatch.vue";
+import SHomeDashNews from "@/components/app/HomeDash/SHomeDashNews.vue";
 import SHomeDashDeveloper from "@/components/app/HomeDash/SHomeDashDeveloper.vue";
 
 export default defineComponent({
@@ -40,8 +40,8 @@ export default defineComponent({
     SGradientHeading,
     SDashboard,
     SHomeDashFeatured,
-    SHomeDashPatch,
-    SHomeDashStats,
+    // SHomeDashPatch,
+    SHomeDashNews,
     SHomeDashDeveloper,
   },
 });
@@ -55,8 +55,8 @@ export default defineComponent({
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(3, 1fr);
   grid-template-areas:
-    "fm fm fm fm fm fm s s s s"
-    "fm fm fm fm fm fm s s s s"
-    "pn pn pn pn pn pn d d d d";
+    "fm fm fm fm fm fm n n n n"
+    "fm fm fm fm fm fm n n n n"
+    "fm fm fm fm fm fm d d d d";
 }
 </style>
