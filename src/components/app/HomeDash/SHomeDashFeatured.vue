@@ -2,7 +2,13 @@
   <s-dashboard-card class="flex flex-col">
     <s-home-dash-title>Featured Maps</s-home-dash-title>
 
+    <div v-if="isLoading" class="m-auto flex flex-col items-center w-full">
+      <s-gradient-heading :size="5"> Loading Maps... </s-gradient-heading>
+      <s-spinner-bar class="h-5 mt-4 w-full max-w-2xl px-8 mx-auto" />
+    </div>
+
     <s-map-list
+      v-else
       class="map-list mt-3"
       :maps="maps"
       @map-clicked="downloadMap(maps[$event])"
@@ -33,6 +39,8 @@ import SHomeDashTitle from "./SHomeDashTitle.vue";
 import SMapList from "@/components/app/Map/SMapList.vue";
 import SModalsDownload from "@/components/app/Modals/SModalsDownload.vue";
 import { onBeforeRouteLeave } from "vue-router";
+import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
+import SSpinnerBar from "@/components/shared/Spinner/SSpinnerBar.vue";
 
 export default defineComponent({
   name: "SHomeDashFeatured",
@@ -41,6 +49,8 @@ export default defineComponent({
     SHomeDashTitle,
     SMapList,
     SModalsDownload,
+    SGradientHeading,
+    SSpinnerBar,
   },
   setup() {
     const db = getFirestore();
@@ -127,12 +137,12 @@ export default defineComponent({
   flex-grow: 1;
 
   > * {
-    height: 100%;
+    height: 100% !important;
   }
 
   @media screen and (max-width: 1596px) {
     > * {
-      height: 18rem;
+      height: 18rem !important;
     }
   }
 }
