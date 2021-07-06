@@ -1,7 +1,7 @@
 {
   "package": {
-    "productName": "scoot-map-manager",
-    "version": "0.1.0"
+    "productName": "SCOOT Map Manager",
+    "version": "1.0.0"
   },
   "build": {
     "distDir": "Set automatically by Vue CLI plugin",
@@ -13,7 +13,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "com.scootmaps.com",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -24,8 +24,8 @@
       "resources": [],
       "externalBin": [],
       "copyright": "",
-      "category": "DeveloperTool",
-      "shortDescription": "",
+      "category": "Games",
+      "shortDescription": "A map manager for the game SCOOT.",
       "longDescription": "",
       "deb": {
         "depends": [],
@@ -60,6 +60,9 @@
       },
       "shell": {
         "open": true
+      },
+      "http": {
+        "all": true
       }
     },
     "windows": [
@@ -75,7 +78,7 @@
       }
     ],
     "security": {
-      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self' img-src: 'self'"
+      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self'"
     }
   }
 }

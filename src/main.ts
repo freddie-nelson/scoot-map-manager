@@ -2,6 +2,8 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+
+// import tailwind
 import "./assets/tailwind.css";
 
 // import fonts
@@ -19,7 +21,7 @@ import "@fontsource/roboto-mono/600.css";
 
 // setup firebase
 import { initializeApp } from "firebase/app";
-import { browserLocalPersistence, getAuth } from "firebase/auth";
+import { browserLocalPersistence, initializeAuth } from "firebase/auth";
 import { enableIndexedDbPersistence, getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -32,15 +34,16 @@ const firebaseConfig = {
   measurementId: "G-8SEWBC1GRC",
 };
 
-initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
 
 const db = getFirestore();
 enableIndexedDbPersistence(db)
   .then(() => console.log("enabled indexed db persistence"))
   .catch((e) => console.log(e));
 
-const auth = getAuth();
-auth.setPersistence(browserLocalPersistence);
+const auth = initializeAuth(firebaseApp, {
+  persistence: browserLocalPersistence,
+});
 
 auth.onAuthStateChanged(() => {
   store.commit("SET_USER", auth.currentUser || undefined);
