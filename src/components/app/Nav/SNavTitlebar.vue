@@ -44,7 +44,7 @@
       </button>
 
       <button
-        @click="maximize"
+        @click="toggleMaximize"
         class="
           w-6
           h-6
@@ -57,7 +57,12 @@
           mx-8
         "
       >
-        <Icon class="w-full h-full" :icon="icons.maximize" />
+        <Icon
+          v-if="showMaximize"
+          class="w-full h-full"
+          :icon="icons.maximize"
+        />
+        <Icon v-else class="w-full h-full" :icon="icons.unmaximize" />
       </button>
 
       <button
@@ -80,12 +85,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { appWindow } from "@tauri-apps/api/window";
 
 import { Icon } from "@iconify/vue";
 import closeIcon from "@iconify-icons/feather/x";
 import maximizeIcon from "@iconify-icons/feather/maximize";
+import unmaximizeIcon from "@iconify-icons/feather/minimize";
 import minimizeIcon from "@iconify-icons/feather/minus";
 
 export default defineComponent({
@@ -94,14 +100,37 @@ export default defineComponent({
     Icon,
   },
   setup() {
+    const showMaximize = ref(true);
+
+    onMounted(async () => {
+      showMaximize.value = !(await appWindow.isMaximized());
+    });
+
     return {
       minimize: appWindow.minimize,
-      maximize: appWindow.maximize,
+
+      showMaximize,
+      toggleMaximize: async () => {
+        try {
+          if (await appWindow.isMaximized()) {
+            showMaximize.value = true;
+            await appWindow.unmaximize();
+          } else {
+            showMaximize.value = false;
+            await appWindow.maximize();
+          }
+        } catch (e) {
+          console.log(e);
+          return;
+        }
+      },
+
       close: appWindow.close,
 
       icons: {
         close: closeIcon,
         maximize: maximizeIcon,
+        unmaximize: unmaximizeIcon,
         minimize: minimizeIcon,
       },
     };

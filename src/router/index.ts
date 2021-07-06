@@ -85,7 +85,8 @@ router.beforeEach((g) => {
 
   if (name.match(/(Profile|Upload)/) && !store.state.user) router.push({ name: "Login" });
 
-  if (!store.state.gameDir.dir && name !== "Setup") {
+  if (!store.state.gameDir.base && name !== "Setup") {
+    console.log(store.state.gameDir);
     router.push({ name: "Setup" });
   }
 });

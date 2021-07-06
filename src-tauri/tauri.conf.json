@@ -60,9 +60,6 @@
       },
       "shell": {
         "open": true
-      },
-      "http": {
-        "all": true
       }
     },
     "windows": [

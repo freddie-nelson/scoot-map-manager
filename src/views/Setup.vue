@@ -49,7 +49,7 @@ export default defineComponent({
     });
 
     const gameDir = ref(
-      `${store.state.gameDir.dir}/${store.state.gameDir.base}`
+      store.state.gameDir.base ? `${store.state.gameDir.base}` : ""
     );
 
     const openDialog = async () => {
