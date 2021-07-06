@@ -20,12 +20,10 @@ import {
   where,
   deleteDoc,
   OrderByDirection,
-  queryEqual,
   getDocsFromCache,
 } from "firebase/firestore";
 import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 import { createDir, writeBinaryFile } from "@tauri-apps/api/fs";
-import { buildInputFile, Call } from "wasm-imagemagick";
 
 export interface Order {
   field: string;
@@ -38,6 +36,8 @@ const defaultOrder: Order = {
 };
 
 export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage = 0, mapsPerPage = 20) {
+  const { buildInputFile, Call } = window.magick;
+
   const storage = getStorage();
 
   const db = getFirestore();

@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    magick: any;
+  }
+}
+
 import { computed, Ref, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import store, { Map } from "@/store";
@@ -20,11 +26,12 @@ import {
   StorageReference,
   uploadBytes,
 } from "@firebase/storage";
-import { buildInputFile, Call } from "wasm-imagemagick";
 import { readTextFile } from "@tauri-apps/api/fs";
 import { User } from "@firebase/auth";
 
 export default function (map: Ref<Map | undefined>) {
+  const { buildInputFile, Call } = window.magick;
+
   const db = getFirestore();
 
   const storage = getStorage();
