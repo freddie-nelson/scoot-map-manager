@@ -1,8 +1,8 @@
 import { Order } from "@/hooks/useUserMaps";
-import { DocumentData, Query } from "@firebase/firestore";
+import { DocumentData } from "@firebase/firestore";
 import { User } from "firebase/auth";
-import pathParse from "path-parse";
 import { createStore, useStore as vuexUseStore } from "vuex";
+import path from "path-browserify";
 export interface Toast {
   text: string;
   duration?: number;
@@ -18,8 +18,6 @@ export interface Map {
   docId?: string;
 }
 
-export type ParsedPath = ReturnType<typeof pathParse>;
-
 export interface QueryInfo {
   [index: string]: any;
   order: Order;
@@ -31,8 +29,8 @@ export interface QueryInfo {
 export interface State {
   toastQueue: Toast[];
   user?: User;
-  gameDir: ParsedPath;
-  mapsDir: ParsedPath;
+  gameDir: string;
+  mapsDir: string;
   installedMaps: Map[];
   isLoadingInstalled: boolean;
   lastLoadedMaps: number;
@@ -44,7 +42,7 @@ export interface State {
 }
 
 const gameDirStr = window.localStorage.getItem("gameDir");
-const gameDir: ParsedPath = gameDirStr ? JSON.parse(gameDirStr) : pathParse("/");
+const gameDir = gameDirStr ? path.normalize(gameDirStr) : "";
 
 const store = createStore<State>({
   state: {
@@ -69,11 +67,11 @@ const store = createStore<State>({
       state.user = user;
     },
 
-    SET_GAME_DIR(state, dir: ParsedPath) {
+    SET_GAME_DIR(state, dir: string) {
       state.gameDir = dir;
-      window.localStorage.setItem("gameDir", JSON.stringify(dir));
+      window.localStorage.setItem("gameDir", dir);
 
-      state.mapsDir = pathParse(`${dir.base}/Scoot_Data/StreamingAssets/Map Saves/`);
+      state.mapsDir = path.join(dir, "/Scoot_Data/StreamingAssets/Map Saves/");
     },
 
     SET_INSTALLED_MAPS(state, maps: Map[]) {

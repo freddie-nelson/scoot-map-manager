@@ -2,8 +2,27 @@
   <s-nav-titlebar />
   <s-nav-sidebar />
   <router-view
+    v-if="!isLoading"
     class="w-full h-full p-14 -ml-24 bg-bg-dark text-t-main relative"
   />
+  <main
+    v-else
+    class="
+      flex flex-col
+      w-full
+      h-full
+      p-14
+      -ml-24
+      bg-bg-dark
+      text-t-main
+      relative
+      justify-center
+      items-center
+    "
+  >
+    <s-gradient-heading :size="5">Loading App...</s-gradient-heading>
+    <s-spinner-bar class="mt-6 max-w-3xl w-full h-5 px-10" />
+  </main>
 
   <!-- force tailwind to load all font sizes -->
   <h1
@@ -26,12 +45,33 @@
 <script>
 import SNavSidebar from "@/components/app/Nav/SNavSidebar.vue";
 import SNavTitlebar from "./components/app/Nav/SNavTitlebar.vue";
+import SSpinnerBar from "./components/shared/Spinner/SSpinnerBar.vue";
+import { onMounted, ref } from "@vue/runtime-core";
+import SGradientHeading from "./components/shared/Heading/SGradientHeading.vue";
 
 export default {
   name: "App",
   components: {
     SNavSidebar,
     SNavTitlebar,
+    SSpinnerBar,
+    SGradientHeading,
+  },
+  setup() {
+    const isLoading = ref(true);
+
+    onMounted(() => {
+      const interval = setInterval(() => {
+        if (window.magick && window.magick.Call) {
+          isLoading.value = false;
+          clearInterval(interval);
+        }
+      }, 100);
+    });
+
+    return {
+      isLoading,
+    };
   },
 };
 </script>

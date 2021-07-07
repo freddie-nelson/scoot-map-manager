@@ -23,9 +23,9 @@ tauri = { version = "1.0.0-beta.2", features = ["dialog-open", "fs-all", "fs-cop
 default = [ "custom-protocol" ]
 custom-protocol = [ "tauri/custom-protocol" ]
 
-[profile.release]
-panic = "abort"
-codegen-units = 1
-lto = true
-incremental = false
-opt-level = "s"
+#[profile.release]
+#panic = "abort"
+#codegen-units = 1
+#lto = true
+#incremental = false
+#opt-level = "s"

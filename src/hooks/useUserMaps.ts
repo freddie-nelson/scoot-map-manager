@@ -24,6 +24,7 @@ import {
 } from "firebase/firestore";
 import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 import { createDir, writeBinaryFile } from "@tauri-apps/api/fs";
+import path from "path-browserify";
 
 export interface Order {
   field: string;
@@ -226,7 +227,7 @@ export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage 
       return;
     }
 
-    const mapDir = `${store.state.mapsDir.dir}/${map.name}`;
+    const mapDir = path.join(store.state.mapsDir, map.name);
 
     console.log(store.state.mapsDir);
     console.log(mapDir);

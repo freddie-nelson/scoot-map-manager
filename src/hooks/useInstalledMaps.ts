@@ -2,12 +2,12 @@ import { Map, useStore } from "@/store";
 import { useRouter } from "vue-router";
 import { FileEntry, readDir, removeDir, readBinaryFile } from "@tauri-apps/api/fs";
 import { getLastModified } from "@/plugins/Metadata";
-import pathParse from "path-parse";
+import path from "path-browserify";
 
 export default function () {
   const store = useStore();
   const router = useRouter();
-  const mapsDir = store.state.mapsDir.dir;
+  const mapsDir = store.state.mapsDir;
 
   const readAndParseMaps = async (force = false) => {
     let folders: FileEntry[];
@@ -87,11 +87,11 @@ export default function () {
   };
 
   const deleteMap = async (map: Map) => {
-    const path = pathParse(map.parkFile);
+    const p = path.normalize(map.parkFile);
     const i = store.state.installedMaps.findIndex((m) => m === map);
 
     try {
-      await removeDir(path.dir, { recursive: true });
+      await removeDir(p, { recursive: true });
       store.commit("REMOVE_INSTALLED_MAP", i);
     } catch (error) {
       console.log(error);

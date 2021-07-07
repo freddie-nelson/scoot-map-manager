@@ -6,10 +6,7 @@ declare module "*.vue" {
   export default component;
 }
 
-declare module "image-blob-reduce" {
-  export default class ImageBlobReduce {
-    constructor() {}
-
-    toBlob(b: Blob, maxSize: number): Blob;
-  }
+declare module "path-browserify" {
+  import path from "path";
+  export default path;
 }

@@ -23,8 +23,8 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
-import { dialog, fs, path } from "@tauri-apps/api";
-import pathParse from "path-parse";
+import { dialog, fs, path as tauriPath } from "@tauri-apps/api";
+import path from "path-browserify";
 
 import SInputText from "@/components/shared/Input/SInputText.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
@@ -45,12 +45,10 @@ export default defineComponent({
 
     let homeDir: string;
     onMounted(async () => {
-      homeDir = await path.homeDir();
+      homeDir = await tauriPath.homeDir();
     });
 
-    const gameDir = ref(
-      store.state.gameDir.base ? `${store.state.gameDir.base}` : ""
-    );
+    const gameDir = ref(store.state.gameDir || "");
 
     const openDialog = async () => {
       let dir = await dialog.open({
@@ -71,7 +69,7 @@ export default defineComponent({
         const res = await fs.readDir(gameDir.value);
         if (!res) return;
 
-        store.commit("SET_GAME_DIR", pathParse(gameDir.value));
+        store.commit("SET_GAME_DIR", path.normalize(gameDir.value));
         router.push({ name: "Installed" });
       } catch (e) {
         return;
