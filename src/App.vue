@@ -55,4 +55,14 @@ body {
 main {
   border-radius: 1rem;
 }
+
+::-webkit-scrollbar {
+  width: 0.7rem;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 0.25rem;
+}
 </style>

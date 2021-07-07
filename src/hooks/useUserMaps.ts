@@ -228,6 +228,9 @@ export default function (maps: Ref<Map[]>, startOrder = defaultOrder, startPage 
 
     const mapDir = `${store.state.mapsDir.dir}/${map.name}`;
 
+    console.log(store.state.mapsDir);
+    console.log(mapDir);
+
     try {
       await createDir(mapDir, { recursive: true });
       await writeBinaryFile({

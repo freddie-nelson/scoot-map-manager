@@ -7,7 +7,7 @@ import pathParse from "path-parse";
 export default function () {
   const store = useStore();
   const router = useRouter();
-  const mapsDir = `${store.state.mapsDir.dir}/`;
+  const mapsDir = store.state.mapsDir.dir;
 
   const readAndParseMaps = async (force = false) => {
     let folders: FileEntry[];

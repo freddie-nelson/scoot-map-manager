@@ -73,7 +73,7 @@ const store = createStore<State>({
       state.gameDir = dir;
       window.localStorage.setItem("gameDir", JSON.stringify(dir));
 
-      state.mapsDir = pathParse(`${dir.dir}/${dir.base}/Scoot_Data/StreamingAssets/Map Saves/`);
+      state.mapsDir = pathParse(`${dir.base}/Scoot_Data/StreamingAssets/Map Saves/`);
     },
 
     SET_INSTALLED_MAPS(state, maps: Map[]) {
