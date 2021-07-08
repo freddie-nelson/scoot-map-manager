@@ -18,6 +18,7 @@
         Sign Out
       </s-button-danger>
     </header>
+
     <s-profile-info />
   </main>
 </template>

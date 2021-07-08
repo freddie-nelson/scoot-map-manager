@@ -25,7 +25,9 @@
         placeholder="johnsmith16"
       />
 
-      <s-button class="mt-4" @click="changeName">Change Name</s-button>
+      <s-button class="mt-4" @click="changeName">{{
+        changing ? "Changing name..." : "Change Name"
+      }}</s-button>
 
       <s-form-error v-if="changeError" class="mt-4"
         >There was an error changing your display name.</s-form-error
@@ -75,16 +77,16 @@ export default defineComponent({
       "";
     const displayName = ref(currentDisplayName);
 
-    let changing = false;
+    const changing = ref(false);
     const changeError = ref(false);
     const changeSuccess = ref(false);
     const changeName = async () => {
       changeError.value = false;
       changeSuccess.value = false;
 
-      if (changing || displayName.value === currentDisplayName) return;
+      if (changing.value || displayName.value === currentDisplayName) return;
 
-      changing = true;
+      changing.value = true;
 
       try {
         if (!auth.currentUser) return;
@@ -99,12 +101,13 @@ export default defineComponent({
         changeError.value = true;
         return;
       } finally {
-        changing = false;
+        changing.value = false;
       }
     };
 
     return {
       displayName,
+      changing,
       changeName,
       changeError,
       changeSuccess,
