@@ -4,7 +4,7 @@ import router from "./router";
 import store from "./store";
 
 // import tailwind
-import "../src/assets/tailwind.css";
+import "@/assets/tailwind.css";
 
 // import fonts
 import "@fontsource/poppins/300.css";

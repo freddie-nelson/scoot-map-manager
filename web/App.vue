@@ -1,5 +1,7 @@
 <template>
-  <router-view class="w-full h-full p-14 bg-bg-dark text-t-main relative" />
+  <router-view
+    class="w-full h-full p-1 md:p-12 bg-bg-dark text-t-main relative"
+  />
 </template>
 
 <script>
@@ -17,7 +19,7 @@ body {
   width: 100vw;
   height: 100%;
   min-height: 100vh;
-  overflow: hidden;
+  font-size: clamp(11px, 2.5vw, 16px);
 }
 
 #app {
