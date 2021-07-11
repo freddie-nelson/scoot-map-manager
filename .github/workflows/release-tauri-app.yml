@@ -90,15 +90,18 @@ jobs:
         include:
           - platform: ubuntu-latest
             buildFolder: bundle/deb
+            name: "scoot-map-manager"
             ext: "_amd64.deb"
             compressed: ""
           - platform: macos-latest
             buildFolder: bundle/dmg
-            ext: ".dmg"
+            name: "SCOOT Map Manager"
+            ext: "_x64.dmg"
             compressed: ""
           - platform: windows-latest
-            buildFolder: ""
-            ext: ".x64.msi"
+            buildFolder: bundle/msi
+            name: "SCOOT Map Manager"
+            ext: "_x64.msi"
             compressed: ""
 
     steps:
@@ -129,24 +132,6 @@ jobs:
         run: echo ::set-env name=PACKAGE_VERSION::$(node -p "require('./package.json').version")
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
-      - name: add version info for osx files
-        if: matrix.platform == 'macos-latest'
-        working-directory: ${{ format('./src-tauri/target/release/{0}', matrix.buildFolder ) }}
-        run: |
-          mv scoot-map-manager.dmg scoot-map-manager${{ env.PACKAGE_VERSION }}.dmg
-      - name: add version info for msi files
-        if: matrix.platform == 'windows-latest'
-        run: |
-          dir
-          $env:PACKAGE_VERSION=$(node -p "require('.\\package.json').version")
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
-      - name: add version info for msi files
-        if: matrix.platform == 'windows-latest'
-        working-directory: ${{ format('./src-tauri/target/release/{0}', matrix.buildFolder ) }}
-        run: |
-          ren scoot-map-manager.x64.msi scoot-map-manager${{ env.PACKAGE_VERSION }}.x64.msi
-          # mv scoot-map-manager.x64.msi scoot-map-manager${{ env.PACKAGE_VERSION }}.x64.msi
       - name: upload release asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1.0.2
@@ -155,6 +140,6 @@ jobs:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:
           upload_url: ${{ needs.create-release.outputs.RELEASE_UPLOAD_URL }}
-          asset_path: ${{ format('./src-tauri/target/release/{0}/scoot-map-manager{1}{2}{3}', matrix.buildFolder, env.PACKAGE_VERSION, matrix.ext, matrix.compressed ) }}
-          asset_name: ${{ format('scoot-map-manager{0}{1}{2}', env.PACKAGE_VERSION, matrix.ext, matrix.compressed ) }}
+          asset_path: ${{ format('./src-tauri/target/release/{0}/{1}_{2}{3}{4}', matrix.buildFolder, matrix.name, env.PACKAGE_VERSION, matrix.ext, matrix.compressed ) }}
+          asset_name: ${{ format('{0}_{1}{2}{3}', matrix.name, env.PACKAGE_VERSION, matrix.ext, matrix.compressed ) }}
           asset_content_type: application/zip
