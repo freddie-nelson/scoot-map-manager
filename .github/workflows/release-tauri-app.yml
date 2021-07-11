@@ -16,12 +16,12 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
-      - name: get version and set env
+      - name: get version
         run: |
-          dir
-          $env:PACKAGE_VERSION=$(node -p "require('.\\package.json').version")
-          echo %PACKAGE_VERSION%
-          dir
+          $version = (node -p "require('./package.json').version")
+          echo [string]::Format("PACKAGE_VERSION={0}", $version) | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          echo $Env:GITHUB_ENV
+        shell: pwsh
   check-build:
     needs: check-windows
     runs-on: ubuntu-latest
@@ -64,7 +64,8 @@ jobs:
       - name: get version
         run: |
           $version = (node -p "require('./package.json').version")
-          echo "PACKAGE_VERSION={0}" -f $version | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          echo [string]::Format("PACKAGE_VERSION={0}", $version) | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          echo $Env:GITHUB_ENV
         shell: pwsh
       - name: create release
         id: create_tauri_release
@@ -132,7 +133,8 @@ jobs:
       - name: get version
         run: |
           $version = (node -p "require('./package.json').version")
-          echo "PACKAGE_VERSION={0}" -f $version | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          echo [string]::Format("PACKAGE_VERSION={0}", $version) | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          echo $Env:GITHUB_ENV
         shell: pwsh
       - name: upload release asset
         id: upload-release-asset
