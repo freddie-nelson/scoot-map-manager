@@ -129,7 +129,7 @@ jobs:
           cd src-tauri && cargo update && cd ../
           npm run tauri:build
       - name: get version windows
-        if: matrix.platform == "windows-latest"
+        if: matrix.platform == 'windows-latest'
         run: |
           dir
           $env:PACKAGE_VERSION=$(node -p "require('.\\package.json').version")
@@ -138,7 +138,7 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
       - name: get version
-        if: matrix.platform != "windows-latest"
+        if: matrix.platform != 'windows-latest'
         run: echo ::set-env name=PACKAGE_VERSION::$(node -p "require('./package.json').version")
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
