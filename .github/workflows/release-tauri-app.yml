@@ -19,7 +19,7 @@ jobs:
       - name: get version
         run: |
           $version = (node -p "require('./package.json').version")
-          echo [string]::Format("PACKAGE_VERSION={0}", $version) | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          [string]::Format("PACKAGE_VERSION={0}", $version) | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
           echo $Env:GITHUB_ENV
         shell: pwsh
   check-build:
@@ -64,7 +64,7 @@ jobs:
       - name: get version
         run: |
           $version = (node -p "require('./package.json').version")
-          echo [string]::Format("PACKAGE_VERSION={0}", $version) | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          [string]::Format("PACKAGE_VERSION={0}", $version) | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
           echo $Env:GITHUB_ENV
         shell: pwsh
       - name: create release
@@ -133,7 +133,7 @@ jobs:
       - name: get version
         run: |
           $version = (node -p "require('./package.json').version")
-          echo [string]::Format("PACKAGE_VERSION={0}", $version) | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+          [string]::Format("PACKAGE_VERSION={0}", $version) | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
           echo $Env:GITHUB_ENV
         shell: pwsh
       - name: upload release asset
