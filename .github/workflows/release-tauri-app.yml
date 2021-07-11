@@ -63,15 +63,18 @@ jobs:
           node-version: 16
       - name: get version
         run: echo ::set-env name=PACKAGE_VERSION::$(node -p "require('./package.json').version")
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
       - name: create release
         id: create_tauri_release
         uses: jbolda/create-release@v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:
           tag_name: v${{ env.PACKAGE_VERSION }}
           release_name: "SCOOT Map Manager v${{ env.PACKAGE_VERSION }}"
-          body: "See the assets to download this version and install."
+          body: ""
           draft: true
           prerelease: false
 
@@ -124,6 +127,8 @@ jobs:
           npm run tauri:build
       - name: get version
         run: echo ::set-env name=PACKAGE_VERSION::$(node -p "require('./package.json').version")
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
       - name: add version info for osx files
         if: matrix.platform == 'macos-latest'
         working-directory: ${{ format('./src-tauri/target/release/{0}', matrix.buildFolder ) }}
@@ -134,6 +139,8 @@ jobs:
         run: |
           dir
           $env:PACKAGE_VERSION=$(node -p "require('.\\package.json').version")
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
       - name: add version info for msi files
         if: matrix.platform == 'windows-latest'
         working-directory: ${{ format('./src-tauri/target/release/{0}', matrix.buildFolder ) }}
@@ -145,6 +152,7 @@ jobs:
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:
           upload_url: ${{ needs.create-release.outputs.RELEASE_UPLOAD_URL }}
           asset_path: ${{ format('./src-tauri/target/release/{0}/scoot-map-manager{1}{2}{3}', matrix.buildFolder, env.PACKAGE_VERSION, matrix.ext, matrix.compressed ) }}
