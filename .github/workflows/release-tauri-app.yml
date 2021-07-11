@@ -128,7 +128,17 @@ jobs:
         run: |
           cd src-tauri && cargo update && cd ../
           npm run tauri:build
+      - name: get version windows
+        if: matrix.platform == "windows-latest"
+        run: |
+          dir
+          $env:PACKAGE_VERSION=$(node -p "require('.\\package.json').version")
+          echo %PACKAGE_VERSION%
+          dir
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
       - name: get version
+        if: matrix.platform != "windows-latest"
         run: echo ::set-env name=PACKAGE_VERSION::$(node -p "require('./package.json').version")
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
@@ -138,7 +148,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
-          PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
         with:
           upload_url: ${{ needs.create-release.outputs.RELEASE_UPLOAD_URL }}
           asset_path: ${{ format('./src-tauri/target/release/{0}/{1}_{2}{3}{4}', matrix.buildFolder, matrix.name, env.PACKAGE_VERSION, matrix.ext, matrix.compressed ) }}

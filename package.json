@@ -1,6 +1,6 @@
 {
   "name": "scoot-map-manager",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "scripts": {
     "serve": "cross-env APP_TYPE=\"main\" vue-cli-service serve",
