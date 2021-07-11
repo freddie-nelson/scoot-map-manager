@@ -7,12 +7,12 @@ module.exports = {
   outputDir: !isMainApp ? path.resolve(__dirname, `${appDir}/dist`) : undefined,
   chainWebpack: (config) => {
     config.resolve.alias.set("@", path.resolve(__dirname, "src"));
-    config.resolve.alias.set("@web", path.resolve(__dirname, "web"));
+    config.resolve.alias.set("@web", path.resolve(__dirname, "web/src"));
 
     if (!isMainApp) {
       config.plugin("html").tap((args) => {
-        args[0].template = path.resolve(__dirname, `${appDir}/template.html`);
-        args[0].title = "Scoot Map Manager";
+        args[0].template = path.resolve(__dirname, `${appDir}/public/template.html`);
+        args[0].title = "SCOOT Map Manager";
         return args;
       });
     }
