@@ -3,9 +3,13 @@
     <router-link to="/">
       <s-gradient-heading :size="3">SCOOT Map Manager</s-gradient-heading>
     </router-link>
-    <s-button-outline class="transform scale-90" type="download"
-      >Download</s-button-outline
+    <s-button-outline
+      class="transform scale-90"
+      type="download"
+      @click="$emit('download')"
     >
+      Download
+    </s-button-outline>
   </nav>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <main class="flex flex-col overflow-y-scroll" style="padding-top: 0">
-    <s-nav-home />
+    <s-home-nav @download="download" />
 
     <section class="grid grid-cols-1 xl:grid-cols-2 gap-8 w-full px-20 my-auto">
       <div class="row-start-2 mx-auto mt-10 xl:row-auto xl:m-0">
@@ -40,7 +40,7 @@
           <s-button-outline class="sm:mr-8" @click="openSupportPage"
             >Support SMM</s-button-outline
           >
-          <s-button>Download</s-button>
+          <s-button @click="download">Download</s-button>
         </div>
       </div>
 
@@ -64,9 +64,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onBeforeMount } from "vue";
+import { getNewestRelease } from "../api/github";
 
-import SNavHome from "@web/components/app/Home/SHomeNav.vue";
+import SHomeNav from "@web/components/app/Home/SHomeNav.vue";
 import SHomeFeature from "@web/components/app/Home/SHomeFeature.vue";
 import SButton from "@/components/shared/Button/SButton.vue";
 import SButtonOutline from "@/components/shared/Button/SButtonOutline.vue";
@@ -79,7 +80,7 @@ import mapsIcon from "@iconify-icons/feather/map";
 export default defineComponent({
   name: "Home",
   components: {
-    SNavHome,
+    SHomeNav,
     SHomeFeature,
     SButton,
     SButtonOutline,
@@ -89,8 +90,49 @@ export default defineComponent({
       window.open("https://ko-fi.com/xdfreddie");
     };
 
+    let version = "";
+    const currentPlatform = navigator.platform.includes("Windows")
+      ? "windows"
+      : navigator.platform.includes("Mac")
+      ? "mac"
+      : "linux";
+    const downloads = {
+      windows: {},
+      mac: {},
+      linux: {},
+    };
+
+    const download = () => {
+      const d = downloads[currentPlatform] as any;
+      const a = document.createElement("a");
+      a.href = d.browser_download_url;
+      a.setAttribute("download", d.name);
+      a.click();
+    };
+
+    onBeforeMount(async () => {
+      const release = await getNewestRelease();
+      if (!release) return;
+
+      version = release.tag_name.slice(1);
+
+      downloads.windows = release.assets.filter((a: any) =>
+        a.name.endsWith("msi")
+      )[0];
+      downloads.mac = release.assets.filter((a: any) =>
+        a.name.endsWith("dmg")
+      )[0];
+      downloads.linux = release.assets.filter((a: any) =>
+        a.name.endsWith("deb")
+      )[0];
+    });
+
     return {
       openSupportPage,
+      version,
+      currentPlatform,
+      downloads,
+      download,
       icons: {
         download: downloadIcon,
         upload: uploadIcon,

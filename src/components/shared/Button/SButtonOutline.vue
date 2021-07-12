@@ -1,6 +1,5 @@
 <template>
   <button
-    @click="$emit('click', $event)"
     class="
       inline-flex
       justify-center
