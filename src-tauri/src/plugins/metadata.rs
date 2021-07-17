@@ -1,8 +1,9 @@
 use std::fs;
 use std::time::UNIX_EPOCH;
-use tauri::{plugin::Plugin, Invoke, Params};
+use tauri::Runtime;
+use tauri::{plugin::Plugin, Invoke};
 
-pub struct Metadata<M: Params> {
+pub struct Metadata<M: Runtime> {
   invoke_handler: Box<dyn Fn(Invoke<M>) + Send + Sync>,
   // plugin state, configuration fields
 }
@@ -27,7 +28,7 @@ fn get_last_modified(file: String) -> Result<u64, u64> {
   }
 }
 
-impl<M: Params> Default for Metadata<M> {
+impl<M: Runtime> Default for Metadata<M> {
   // you can add configuration fields here,
   // see https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
   fn default() -> Self {
@@ -37,7 +38,7 @@ impl<M: Params> Default for Metadata<M> {
   }
 }
 
-impl<M: Params> Plugin<M> for Metadata<M> {
+impl<M: Runtime> Plugin<M> for Metadata<M> {
   /// The plugin name. Must be defined and used on the `invoke` calls.
   fn name(&self) -> &'static str {
     "metadata"

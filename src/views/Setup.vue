@@ -23,7 +23,8 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
-import { dialog, fs, path as tauriPath } from "@tauri-apps/api";
+import { dialog, path as tauriPath } from "@tauri-apps/api";
+import { readDir } from "@tauri-apps/api/fs";
 import path from "path-browserify";
 
 import SInputText from "@/components/shared/Input/SInputText.vue";
@@ -66,7 +67,7 @@ export default defineComponent({
 
     const submitDir = async () => {
       try {
-        const res = await fs.readDir(gameDir.value);
+        const res = await readDir(gameDir.value);
         if (!res) return;
 
         store.commit("SET_GAME_DIR", path.normalize(gameDir.value));

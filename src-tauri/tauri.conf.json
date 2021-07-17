@@ -50,7 +50,12 @@
     },
     "allowlist": {
       "fs": {
-        "all": true
+        "readDir": true,
+        "removeDir": true,
+        "readBinaryFile": true,
+        "createDir": true,
+        "writeBinaryFile": true,
+        "readTextFile": true
       },
       "dialog": {
         "open": true
