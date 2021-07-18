@@ -30,5 +30,5 @@
     "src/plugins/element.js",
     "shims-vue.d.ts"
   ],
-  "exclude": ["node_modules", "node_modules/@tauri-apps/api"]
+  "exclude": ["node_modules"]
 }

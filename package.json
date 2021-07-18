@@ -9,7 +9,8 @@
     "tauri:build": "cross-env APP_TYPE=\"main\" vue-cli-service tauri:build",
     "tauri:serve": "cross-env APP_TYPE=\"main\" vue-cli-service tauri:serve",
     "serve:web": "cross-env APP_TYPE=\"web\" vue-cli-service serve ./web/src/main.ts",
-    "build:web": "cross-env APP_TYPE=\"web\" vue-cli-service build ./web/src/main.ts"
+    "build:web": "cross-env APP_TYPE=\"web\" vue-cli-service build ./web/src/main.ts",
+    "postinstall": "node ./fixTauriApiWindow.js"
   },
   "dependencies": {
     "@fontsource/poppins": "^4.4.5",

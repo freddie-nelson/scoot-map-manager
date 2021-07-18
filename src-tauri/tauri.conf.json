@@ -60,9 +60,6 @@
       "dialog": {
         "open": true
       },
-      "window": {
-        "all": true
-      },
       "shell": {
         "open": true
       }
