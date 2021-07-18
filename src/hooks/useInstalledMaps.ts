@@ -1,6 +1,6 @@
 import { Map, useStore } from "@/store";
 import { useRouter } from "vue-router";
-import { FileEntry, readDir, removeDir, readBinaryFile } from "@tauri-apps/api/fs";
+import { FileEntry, readDir, removeDir, readBinaryFile, renameFile } from "@tauri-apps/api/fs";
 import { getLastModified } from "@/plugins/Metadata";
 import path from "path-browserify";
 
@@ -87,7 +87,7 @@ export default function () {
   };
 
   const deleteMap = async (map: Map) => {
-    const p = path.normalize(map.parkFile);
+    const p = path.normalize(path.dirname(map.parkFile));
     const i = store.state.installedMaps.findIndex((m) => m === map);
 
     try {
@@ -105,9 +105,24 @@ export default function () {
     router.push({ name: "Upload", params: { mapIndex: i } });
   };
 
+  const renameMap = async (map: Map, name: string) => {
+    const p = path.normalize(path.dirname(map.parkFile));
+    const newP = path.normalize(`${path.dirname(p)}/${name}`);
+
+    try {
+      await renameFile(p, newP);
+      map.name = name;
+      map.parkFile = path.normalize(`${newP}/${path.basename(map.parkFile)}`);
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  };
+
   return {
     readAndParseMaps,
     deleteMap,
     uploadMap,
+    renameMap,
   };
 }

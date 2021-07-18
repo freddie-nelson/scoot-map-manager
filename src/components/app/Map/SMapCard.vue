@@ -8,6 +8,7 @@
       border-4 border-input-blur
       flex flex-col
       relative
+      group
     "
   >
     <div
@@ -57,7 +58,27 @@
       "
     >
       <div class="font-medium">
-        <p>{{ map.name || "Map Name" }}</p>
+        <p class="flex items-center">
+          {{ map.name || "Map Name" }}
+
+          <button
+            v-if="buttonIconName"
+            class="
+              name-button
+              focus:outline-none
+              w-4
+              h-4
+              ml-1.5
+              opacity-0
+              group-hover:opacity-60
+              transition-opacity
+              duration-300
+            "
+            @click="$emit('clicked-name')"
+          >
+            <Icon class="w-full h-full" :icon="buttonIconName" />
+          </button>
+        </p>
         <p class="text-xs opacity-60">{{ map.creator || "Creator" }}</p>
       </div>
 
@@ -124,6 +145,10 @@ export default defineComponent({
       type: Object,
       default: null,
     },
+    buttonIconName: {
+      type: Object,
+      default: null,
+    },
   },
 });
 </script>
@@ -134,5 +159,9 @@ export default defineComponent({
   text-shadow: 0px 0px var(--blur) #000000, 0px 0px var(--blur) #000000,
     0px 0px var(--blur) #000000, 0px 0px var(--blur) #000000,
     0px 0px var(--blur) #000000, 0px 0px var(--blur) #000000;
+}
+
+.name-button:hover {
+  opacity: 1 !important;
 }
 </style>

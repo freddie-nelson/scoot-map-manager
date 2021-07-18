@@ -55,7 +55,9 @@
         "readBinaryFile": true,
         "createDir": true,
         "writeBinaryFile": true,
-        "readTextFile": true
+        "readTextFile": true,
+        "renameFile": true,
+        "path": true
       },
       "dialog": {
         "open": true

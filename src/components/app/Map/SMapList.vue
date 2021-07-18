@@ -6,8 +6,10 @@
       :map="map"
       :buttonIcon="buttonIcon"
       :buttonIcon2="buttonIcon2"
+      :buttonIconName="buttonIconName"
       @clicked="$emit('map-clicked', i)"
       @clicked-2="$emit('map-clicked-2', i)"
+      @clicked-name="$emit('map-clicked-name', i)"
     />
   </section>
 </template>
@@ -35,6 +37,10 @@ export default defineComponent({
       default: downloadIcon,
     },
     buttonIcon2: {
+      type: Object,
+      default: null,
+    },
+    buttonIconName: {
       type: Object,
       default: null,
     },

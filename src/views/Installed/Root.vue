@@ -5,8 +5,13 @@
       :maps="$store.state.installedMaps"
       :buttonIcon="icons.trash"
       :buttonIcon2="icons.upload"
+      :buttonIconName="icons.edit"
       @map-clicked="mapToDelete = $store.state.installedMaps[$event]"
       @map-clicked-2="uploadMap"
+      @map-clicked-name="
+        mapToRename = $store.state.installedMaps[$event];
+        newName = mapToRename.name;
+      "
     />
 
     <h1 v-else class="font-semibold text-2xl text-center py-10 opacity-60">
@@ -21,8 +26,9 @@
           underline
         "
         to="Maps"
-        >Download some made by other users!</router-link
       >
+        Download some made by other users!
+      </router-link>
     </h1>
 
     <s-modals-delete
@@ -33,6 +39,29 @@
       @close="mapToDelete = undefined"
       @delete="deleteMap"
     />
+
+    <s-modal v-if="mapToRename" @close="mapToRename = undefined" closeable>
+      <s-gradient-heading :size="4">
+        Rename {{ mapToRename.name }}
+      </s-gradient-heading>
+
+      <s-input-text
+        class="mt-4 w-full"
+        style="min-width: 24rem"
+        name="Map Name"
+        v-model="newName"
+      />
+
+      <s-button
+        class="mt-5 w-full"
+        @click="
+          renameMap(mapToRename, newName);
+          mapToRename = undefined;
+        "
+      >
+        Rename
+      </s-button>
+    </s-modal>
   </div>
 </template>
 
@@ -43,15 +72,24 @@ import useInstalledMaps from "@/hooks/useInstalledMaps";
 
 import SMapList from "@/components/app/Map/SMapList.vue";
 import SModalsDelete from "@/components/app/Modals/SModalsDelete.vue";
+import SModal from "@/components/shared/Modal/SModal.vue";
+import SGradientHeading from "@/components/shared/Heading/SGradientHeading.vue";
+import SInputText from "@/components/shared/Input/SInputText.vue";
 
 import trashIcon from "@iconify-icons/feather/trash";
 import uploadIcon from "@iconify-icons/feather/upload";
+import editIcon from "@iconify-icons/feather/edit-2";
+import SButton from "@/components/shared/Button/SButton.vue";
 
 export default defineComponent({
   name: "name",
   components: {
     SMapList,
     SModalsDelete,
+    SModal,
+    SGradientHeading,
+    SInputText,
+    SButton,
   },
   props: {
     executeLoadMaps: {
@@ -65,6 +103,7 @@ export default defineComponent({
       readAndParseMaps,
       deleteMap: deleteMapFS,
       uploadMap,
+      renameMap,
     } = useInstalledMaps();
 
     const loadMaps = async (force = false) => {
@@ -106,6 +145,9 @@ export default defineComponent({
       isDeleting.value = false;
     };
 
+    const mapToRename = ref<Map>();
+    const newName = ref("");
+
     return {
       loadMaps,
       uploadMap,
@@ -115,9 +157,14 @@ export default defineComponent({
       showDeleteFail,
       deleteMap,
 
+      mapToRename,
+      newName,
+      renameMap,
+
       icons: {
         trash: trashIcon,
         upload: uploadIcon,
+        edit: editIcon,
       },
     };
   },
