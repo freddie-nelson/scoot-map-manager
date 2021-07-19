@@ -106,6 +106,9 @@ export default function () {
   };
 
   const renameMap = async (map: Map, name: string) => {
+    // return if name is already taken
+    if (store.state.installedMaps.findIndex((m) => m.name === name) !== -1) return;
+
     const p = path.normalize(path.dirname(map.parkFile));
     const newP = path.normalize(`${path.dirname(p)}/${name}`);
 
