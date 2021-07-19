@@ -1,0 +1,19 @@
+{
+  "name": "v1.0.0",
+  "notes": "SCOOT Map Manager v1.0.0",
+  "pub_date": "2020-07-19T22:00:00Z",
+  "platforms": {
+    "darwin": {
+      "signature": "",
+      "url": "https://github.com/freddie-nelson/scoot-map-manager/releases/download/v1.0.0/SCOOT Map Manager.app.tar.gz"
+    },
+    "linux": {
+      "signature": "",
+      "url": "https://github.com/freddie-nelson/scoot-map-manager/releases/download/v1.0.0/scoot-map-manager_1.0.0_amd64.AppImage.tar.gz"
+    },
+    "win64": {
+      "signature": "",
+      "url": "https://github.com/freddie-nelson/scoot-map-manager/releases/download/v1.0.0/SCOOT.Map.Manager_1.0.0_x64.msi.zip"
+    }
+  }
+}

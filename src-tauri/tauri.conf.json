@@ -47,7 +47,9 @@
     },
     "updater": {
       "active": true,
-      "dialog": false
+      "endpoints": [
+        "https://raw.githubusercontent.com/freddie-nelson/scoot-map-manager/main/versioninfo.json"
+      ]
     },
     "allowlist": {
       "fs": {
