@@ -166,7 +166,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
-        if: matrix.platform != 'macos-latest'
         with:
           upload_url: ${{ needs.create-release.outputs.RELEASE_UPLOAD_URL }}
           asset_path: ${{ format('./src-tauri/target/release/{0}/{1}_{2}{3}{4}', matrix.updateFolder, matrix.name, env.PACKAGE_VERSION, matrix.updateExt, matrix.compressed ) }}
@@ -179,10 +178,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
-        if: matrix.platform != 'macos-latest'
         with:
           upload_url: ${{ needs.create-release.outputs.RELEASE_UPLOAD_URL }}
           asset_path: ${{ format('./src-tauri/target/release/{0}/{1}{2}', matrix.updateFolder, matrix.name, matrix.updateExt) }}
           asset_name: ${{ format('{0}_{1}{2}{3}', matrix.name, env.PACKAGE_VERSION, matrix.updateExt, matrix.compressed ) }}
           asset_content_type: application/zip
-        
