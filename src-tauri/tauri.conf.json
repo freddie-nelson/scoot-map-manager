@@ -46,7 +46,8 @@
       }
     },
     "updater": {
-      "active": false
+      "active": true,
+      "dialog": false
     },
     "allowlist": {
       "fs": {

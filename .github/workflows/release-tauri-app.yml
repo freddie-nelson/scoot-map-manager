@@ -88,22 +88,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-latest, macos-latest, windows-latest]
+        platform: [ubuntu-latest, linux-latest, macos-latest, windows-latest]
         include:
           - platform: ubuntu-latest
             buildFolder: bundle/deb
+            updateFolder: ""
             name: "scoot-map-manager"
             ext: "_amd64.deb"
             compressed: ""
+          - platform: linux-latest
+            buildFolder: bundle/appimage
+            updateFolder: bundle/appimage
+            name: "scoot-map-manager"
+            ext: "_amd64.AppImage"
+            updateExt: "_amd64.AppImage.tar.gz"
+            compressed: ""
           - platform: macos-latest
             buildFolder: bundle/dmg
+            updateFolder: bundle/macos
             name: "SCOOT Map Manager"
             ext: "_x64.dmg"
+            updateExt: ".app.tar.gz"
             compressed: ""
           - platform: windows-latest
             buildFolder: bundle/msi
+            updateFolder: bundle/msi
             name: "SCOOT Map Manager"
             ext: "_x64.msi"
+            updateExt: "_x64.msi.zip"
             compressed: ""
 
     steps:
@@ -147,3 +159,30 @@ jobs:
           asset_path: ${{ format('./src-tauri/target/release/{0}/{1}_{2}{3}{4}', matrix.buildFolder, matrix.name, env.PACKAGE_VERSION, matrix.ext, matrix.compressed ) }}
           asset_name: ${{ format('{0}_{1}{2}{3}', matrix.name, env.PACKAGE_VERSION, matrix.ext, matrix.compressed ) }}
           asset_content_type: application/zip
+      - name: upload update asset
+        if: matrix.platform != 'ubuntu-latest' && matrix.platform != 'macos-latest'
+        id: upload-update-asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
+        if: matrix.platform != 'macos-latest'
+        with:
+          upload_url: ${{ needs.create-release.outputs.RELEASE_UPLOAD_URL }}
+          asset_path: ${{ format('./src-tauri/target/release/{0}/{1}_{2}{3}{4}', matrix.updateFolder, matrix.name, env.PACKAGE_VERSION, matrix.updateExt, matrix.compressed ) }}
+          asset_name: ${{ format('{0}_{1}{2}{3}', matrix.name, env.PACKAGE_VERSION, matrix.updateExt, matrix.compressed ) }}
+          asset_content_type: application/zip
+      - name: upload update asset macos
+        if: matrix.platform == 'macos-latest'
+        id: upload-update-asset-macos
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
+        if: matrix.platform != 'macos-latest'
+        with:
+          upload_url: ${{ needs.create-release.outputs.RELEASE_UPLOAD_URL }}
+          asset_path: ${{ format('./src-tauri/target/release/{0}/{1}{2}', matrix.updateFolder, matrix.name, matrix.updateExt) }}
+          asset_name: ${{ format('{0}_{1}{2}{3}', matrix.name, env.PACKAGE_VERSION, matrix.updateExt, matrix.compressed ) }}
+          asset_content_type: application/zip
+        

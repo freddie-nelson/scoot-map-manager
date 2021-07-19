@@ -43,10 +43,11 @@
 </template>
 
 <script>
+import { onMounted, ref } from "vue";
+
 import SNavSidebar from "@/components/app/Nav/SNavSidebar.vue";
 import SNavTitlebar from "./components/app/Nav/SNavTitlebar.vue";
 import SSpinnerBar from "./components/shared/Spinner/SSpinnerBar.vue";
-import { onMounted, ref } from "@vue/runtime-core";
 import SGradientHeading from "./components/shared/Heading/SGradientHeading.vue";
 
 export default {
