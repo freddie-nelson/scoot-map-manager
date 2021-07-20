@@ -91,7 +91,7 @@ export default defineComponent({
     };
 
     let version = "";
-    const currentPlatform = navigator.platform.includes("Windows")
+    const currentPlatform = navigator.userAgent.includes("Win")
       ? "windows"
       : navigator.platform.includes("Mac")
       ? "mac"
