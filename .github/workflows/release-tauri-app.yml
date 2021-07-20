@@ -76,7 +76,22 @@ jobs:
         with:
           tag_name: v${{ env.PACKAGE_VERSION }}
           release_name: "SCOOT Map Manager v${{ env.PACKAGE_VERSION }}"
-          body: ""
+          body: |
+            # Installers
+
+            - ```.AppImage``` - any linux distro
+            - ```.deb``` - debian based linux distros (ubuntu)
+            - ```.dmg``` - macos
+            - ```.msi``` - windows
+
+            # Updaters
+
+            - ```.AppImage.tar.gz``` - linux
+            - ```.app.tar.gz``` - macos
+            - ```.msi.zip``` - windows
+
+            **NOTE: ONLY USE IN APP DIALOG TO UPDATE SMM**"
+
           draft: true
           prerelease: false
 
