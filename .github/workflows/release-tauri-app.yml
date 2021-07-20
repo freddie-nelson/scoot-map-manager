@@ -88,19 +88,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-latest, ubuntu-18.04, macos-latest, windows-latest]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - platform: ubuntu-latest
             buildFolder: bundle/deb
-            updateFolder: ""
-            name: "scoot-map-manager"
-            ext: "_amd64.deb"
-            compressed: ""
-          - platform: ubuntu-18.04
-            buildFolder: bundle/appimage
             updateFolder: bundle/appimage
             name: "scoot-map-manager"
-            ext: "_amd64.AppImage"
+            ext: "_amd64.deb"
             updateExt: "_amd64.AppImage.tar.gz"
             compressed: ""
           - platform: macos-latest
@@ -159,8 +153,20 @@ jobs:
           asset_path: ${{ format('./src-tauri/target/release/{0}/{1}_{2}{3}{4}', matrix.buildFolder, matrix.name, env.PACKAGE_VERSION, matrix.ext, matrix.compressed ) }}
           asset_name: ${{ format('{0}_{1}{2}{3}', matrix.name, env.PACKAGE_VERSION, matrix.ext, matrix.compressed ) }}
           asset_content_type: application/zip
+      - name: upload release asset appimage
+        if: matrix.platform == 'ubuntu-latest'
+        id: upload-release-asset-appimage
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
+        with:
+          upload_url: ${{ needs.create-release.outputs.RELEASE_UPLOAD_URL }}
+          asset_path: ${{ format('./src-tauri/target/release/bundle/appimage/{1}_{2}_amd64.AppImage{4}', matrix.name, env.PACKAGE_VERSION, matrix.compressed ) }}
+          asset_name: ${{ format('{0}_{1}_amd64.AppImage{3}', matrix.name, env.PACKAGE_VERSION, matrix.compressed ) }}
+          asset_content_type: application/zip
       - name: upload update asset
-        if: matrix.platform != 'ubuntu-latest' && matrix.platform != 'macos-latest'
+        if: matrix.platform != 'macos-latest'
         id: upload-update-asset
         uses: actions/upload-release-asset@v1.0.2
         env:
