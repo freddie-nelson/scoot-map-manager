@@ -162,8 +162,8 @@ jobs:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:
           upload_url: ${{ needs.create-release.outputs.RELEASE_UPLOAD_URL }}
-          asset_path: ${{ format('./src-tauri/target/release/bundle/appimage/{1}_{2}_amd64.AppImage{4}', matrix.name, env.PACKAGE_VERSION, matrix.compressed ) }}
-          asset_name: ${{ format('{0}_{1}_amd64.AppImage{3}', matrix.name, env.PACKAGE_VERSION, matrix.compressed ) }}
+          asset_path: ${{ format('./src-tauri/target/release/bundle/appimage/{0}_{1}_amd64.AppImage{2}', matrix.name, env.PACKAGE_VERSION, matrix.compressed ) }}
+          asset_name: ${{ format('{0}_{1}_amd64.AppImage{2}', matrix.name, env.PACKAGE_VERSION, matrix.compressed ) }}
           asset_content_type: application/zip
       - name: upload update asset
         if: matrix.platform != 'macos-latest'
