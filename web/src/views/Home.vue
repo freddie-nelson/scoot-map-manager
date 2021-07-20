@@ -123,7 +123,7 @@ export default defineComponent({
         a.name.endsWith("dmg")
       )[0];
       downloads.linux = release.assets.filter((a: any) =>
-        a.name.endsWith("deb")
+        a.name.endsWith("AppImage")
       )[0];
     });
 

@@ -1,6 +1,6 @@
 import { Octokit } from "@octokit/core";
 
-const octokit = new Octokit({ auth: "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" });
+const octokit = new Octokit();
 
 const repo = "scoot-map-manager";
 const user = "freddie-nelson";
