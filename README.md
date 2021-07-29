@@ -4,7 +4,7 @@
 
 ## About
 
-[SCOOT Map Manager](https://scootmaps.com) is a tool that helps you manage your maps for SCOOT and lets you download maps made by the community or upload your own maps for others to enjoy!
+[SCOOT Map Manager](https://scootmaps.club) is a tool that helps you manage your maps for SCOOT and lets you download maps made by the community or upload your own maps for others to enjoy!
 
 ## Features
 
