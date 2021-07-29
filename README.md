@@ -1,4 +1,4 @@
-# 🛴 [SCOOT Map Manager](https://scootmaps.com) 🛴
+# 🛴 [SCOOT Map Manager](https://scootmaps.club) 🛴
 
 <img alt="A screenshot of SCOOT Map Manager" src="https://raw.githubusercontent.com/freddie-nelson/scoot-map-manager/main/web/src/assets/app-home.webp" style="border-radius: .7rem">
 
