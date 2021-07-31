@@ -1,10 +1,10 @@
-# 🛴 [SCOOT Map Manager](https://scootmaps.com) 🛴
+# 🛴 [SCOOT Map Manager](https://scootmaps.club) 🛴
 
 <img alt="A screenshot of SCOOT Map Manager" src="https://raw.githubusercontent.com/freddie-nelson/scoot-map-manager/main/web/src/assets/app-home.webp" style="border-radius: .7rem">
 
 ## About
 
-[SCOOT Map Manager](https://scootmaps.com) is a tool that helps you manage your maps for SCOOT and lets you download maps made by the community or upload your own maps for others to enjoy!
+[SCOOT Map Manager](https://scootmaps.club) is a tool that helps you manage your maps for SCOOT and lets you download maps made by the community or upload your own maps for others to enjoy!
 
 ## Features
 
