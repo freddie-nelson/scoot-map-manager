@@ -31,8 +31,18 @@
             Keep up with the latest SCOOT news
           </s-home-feature>
 
-          <s-home-feature :icon="icons.maps">
+          <s-home-feature class="mb-6" :icon="icons.maps">
             Create, rename and delete your maps
+          </s-home-feature>
+
+          <s-home-feature :icon="icons.github">
+            Completely free and
+            <a
+              class="text-primary-400 hover:underline"
+              href="https://github.com/freddie-nelson/scoot-map-manager"
+            >
+              open source
+            </a>
           </s-home-feature>
         </div>
 
@@ -76,6 +86,7 @@ import downloadIcon from "@iconify-icons/feather/save";
 import uploadIcon from "@iconify-icons/feather/upload";
 import newsIcon from "@iconify-icons/feather/trending-up";
 import mapsIcon from "@iconify-icons/feather/map";
+import githubIcon from "@iconify-icons/feather/github";
 
 export default defineComponent({
   name: "Home",
@@ -138,6 +149,7 @@ export default defineComponent({
         upload: uploadIcon,
         news: newsIcon,
         maps: mapsIcon,
+        github: githubIcon,
       },
     };
   },
